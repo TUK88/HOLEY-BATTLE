@@ -14,27 +14,91 @@
  <button id="createBtn" class="primary" style="width:100%;margin-bottom:10px">CREATE MULTIPLAYER ROOM</button>
  <label class="tiny" for="roomCode">JOIN A FRIEND'S ROOM CODE</label><input id="roomCode" class="field" maxlength="60" placeholder="Paste host room code">
  <button id="joinBtn" class="secondary" style="width:100%">JOIN ROOM</button>
- <div class="status" id="menuStatus">Multiplayer needs an internet connection. No bots are used.</div>
+ <div class="status" id="menuStatus">Room networking uses public relay discovery. No bots are used.</div>
  <div class="tiny">Controls: <span class="key">WASD</span> / <span class="key">↑ ↓ ← →</span> or drag on mobile. No food, energy, or power-up cubes.</div>
  </div></div>
 <div id="lobby" class="screen hidden"><div class="panel" style="text-align:center"><div class="pill">👥 MULTIPLAYER LOBBY</div><h2 style="font-size:32px;margin:12px 0 4px">Gather your crew!</h2><p class="sub">The match starts automatically when <b>5 real players</b> are connected. There are no AI bots.</p><div style="font-size:13px;color:#61708b;font-weight:800;margin:14px 0 5px">ROOM CODE — SHARE WITH FRIENDS</div><div id="showRoomCode" style="font-size:19px;font-weight:1000;overflow-wrap:anywhere;background:#f0f5fb;border-radius:12px;padding:12px;user-select:all">Connecting…</div><button id="copyCode" class="secondary" style="margin-top:10px">COPY ROOM CODE</button><div id="playerList" style="margin:16px 0;text-align:left;background:#f8fafc;border-radius:14px;padding:12px;font-weight:800">Connecting…</div><div id="lobbyStatus" class="status">Waiting for 5 real players…</div><button id="backMenu" class="secondary" style="width:100%">LEAVE LOBBY</button></div></div>
 <div id="game" class="game hidden"><canvas id="canvas"></canvas><div class="hud"><div class="hudcard"><div class="name" id="hudName">Player</div><div class="small" id="hudStats">Territory: 0%</div><div class="small" id="hudArena">Arena shrinks in 05:00</div></div><div class="hudright"><div class="hudcard small" id="hudPlayers">Players: 1/5</div><button id="leaveGame" class="danger">LEAVE</button></div></div><div id="toast" class="toast hidden"></div></div>
 <div id="crash" class="screen hidden"><div class="panel" style="text-align:center"><div style="font-size:56px">💥</div><h2 class="crash-title">YOU <span>CRASHED!</span></h2><p id="crashMessage" class="sub">Your trail was hit! Want to try again?</p><button id="reviveBtn" class="primary" style="width:100%;font-size:18px;margin:8px 0">↻ REVIVE</button><button id="leaveBtn" class="danger" style="width:100%;font-size:18px">↗ LEAVE MATCH</button><p class="tiny" style="margin-top:13px">Revive respawns you safely. Leaving returns you to the lobby.</p></div></div>
-<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
-<script>
+<script type="module">
 (()=>{'use strict';
 const $=id=>document.getElementById(id), screens=['menu','lobby','game','crash'];const show=id=>screens.forEach(s=>$(s).classList.toggle('hidden',s!==id));
 const canvas=$('canvas'),ctx=canvas.getContext('2d',{alpha:false});const WORLD=1400,CELL=14,GRID=Math.floor(WORLD/CELL),TICK=70,SHRINK_MS=300000;const COLORS=['#ff4fa3','#21b9e9','#ff9d42','#8d6bff','#54c77a','#f35e6d','#e5bd22','#36b8a4'];
 let peer=null,host=false,roomId='',connections=new Map(),localId='',players={},running=false,crashed=false,matchStarted=false,lastTick=0,lastBroadcast=0,shrinkAt=0,arenaInset=0,keys={},touchTarget=null,toastTimer=0,gameMode='online',lastFrame=0;
+let trysteroJoinRoom=null, trysteroSelfId='', trRoom=null, trData=null, hostPeerId='', roomAttempt=0;
 let grid=new Uint8Array(GRID*GRID),ownerIndex={},localName='Player';const idx=(x,y)=>y*GRID+x;const rand=(n)=>Math.floor(Math.random()*n);const playerCount=()=>Object.keys(players).filter(id=>players[id]&&players[id].alive).length;
 function resize(){let dpr=Math.min(devicePixelRatio||1,1.5);canvas.width=Math.floor(innerWidth*dpr);canvas.height=Math.floor(innerHeight*dpr);ctx.setTransform(dpr,0,0,dpr,0,0)}addEventListener('resize',resize);resize();
 function say(msg){$('toast').textContent=msg;$('toast').classList.remove('hidden');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.add('hidden'),2300)}
 function setStatus(id,msg){$(id).textContent=msg}
 function genRoom(){return Math.random().toString(36).slice(2,7).toUpperCase()}
 function newPlayer(id,name,color,x,y){return {id,name:(name||'Player').slice(0,16),color:color||COLORS[Object.keys(players).length%COLORS.length],x:x??(WORLD/2+rand(180)-90),y:y??(WORLD/2+rand(180)-90),dir:{x:1,y:0},trail:[],owned:[],alive:true,score:0,invuln:performance.now()+2400,input:{x:0,y:0}}}
-function setupPeer(){if(!window.Peer){setStatus('menuStatus','Peer networking did not load. Check your internet and reload.');return false}return true}
-function createRoom(){localName=$('playerName').value.trim()||'Player';if(!setupPeer())return;setStatus('menuStatus','Creating room…');host=true;roomId=genRoom();peer=new Peer();peer.on('open',id=>{localId=id;roomId=id;$('showRoomCode').textContent=id;$('roomCode').value=id;players={};grid=new Uint8Array(GRID*GRID);ownerIndex={};players[localId]=newPlayer(localId,localName,COLORS[0],WORLD*.5,WORLD*.5);show('lobby');renderLobby();setStatus('lobbyStatus','Waiting for 5 real players to connect…');peer.on('connection',conn=>{connections.set(conn.peer,conn);conn.on('open',()=>{conn.send({type:'welcome',id:conn.peer,hostId:localId,players:publicPlayers(),grid:Array.from(grid),started:matchStarted,shrinkAt:shrinkAt||0});renderLobby()});conn.on('data',data=>hostMessage(conn.peer,data));conn.on('close',()=>{connections.delete(conn.peer);delete players[conn.peer];broadcast({type:'players',players:publicPlayers()});renderLobby()})})});peer.on('error',e=>{setStatus('menuStatus','Connection issue: '+(e.type||'network error')+'. Try again.');if(!matchStarted)show('menu')})}
-function joinRoom(){localName=$('playerName').value.trim()||'Player';let id=$('roomCode').value.trim();if(!id){setStatus('menuStatus','Enter a room code first.');return}if(!setupPeer())return;setStatus('menuStatus','Joining room…');host=false;roomId=id;peer=new Peer();peer.on('open',pid=>{localId=pid;let conn=peer.connect(id,{reliable:true});connections.set(id,conn);conn.on('open',()=>{conn.send({type:'join',name:localName});$('showRoomCode').textContent=id;show('lobby');setStatus('lobbyStatus','Connecting to host…')});conn.on('data',data=>clientMessage(data));conn.on('close',()=>{if(running){say('Host disconnected');show('lobby');running=false}setStatus('lobbyStatus','Connection closed. Return to menu and retry.')})});peer.on('error',e=>setStatus('menuStatus','Could not connect: '+(e.type||'network error')+'. Check the code and try again.'))}
+function setupPeer(){return true}
+async function loadTrystero(){
+ if(trysteroJoinRoom&&trysteroSelfId)return true;
+ try{
+  const mod=await import('https://esm.run/trystero@0.26.0');
+  trysteroJoinRoom=mod.joinRoom;trysteroSelfId=mod.selfId;
+  if(!trysteroJoinRoom||!trysteroSelfId)throw new Error('The room networking library did not load correctly.');
+  return true;
+ }catch(e){setStatus('menuStatus','Could not load multiplayer networking. Check your internet and reopen the game.');return false}
+}
+function makeConnection(id){
+ let existing=connections.get(id);if(existing){existing.open=true;return existing}
+ const conn={peer:id,open:true,send(data){if(this.open&&trData)try{trData.send(data,{target:id})}catch(e){}},close(){this.open=false}};
+ connections.set(id,conn);return conn;
+}
+function enterRoomNetwork(code,isHost){
+ roomAttempt++;const attempt=roomAttempt;
+ try{if(trRoom)trRoom.leave()}catch(e){}
+ host=isHost;roomId=code;hostPeerId='';connections=new Map();
+ trRoom=trysteroJoinRoom({appId:'com.colorclash.paperterritory.game.v2'},code,{
+  onJoinError:({peerId,error})=>{
+   if(attempt!==roomAttempt)return;
+   const msg='Could not connect to a player. Check your internet/network, then try a new room.';
+   setStatus('lobbyStatus',msg);
+  }
+ });
+ trData=trRoom.makeAction('color-clash-game-message-v2');
+ trData.onMessage=(data,meta)=>{
+  const from=meta&&meta.peerId;if(!from||!data||attempt!==roomAttempt)return;
+  if(data.type==='hello'){
+   if(!host&&data.isHost){hostPeerId=from;makeConnection(from).send({type:'join',name:localName});setStatus('lobbyStatus','Connected to host! Joining lobby…')}
+   return;
+  }
+  if(host)hostMessage(from,data);
+  else if(from===hostPeerId)clientMessage(data);
+ };
+ trRoom.onPeerJoin=(id)=>{
+  if(attempt!==roomAttempt)return;
+  const conn=makeConnection(id);
+  conn.send({type:'hello',id:localId,isHost:host,name:localName});
+ };
+ trRoom.onPeerLeave=(id)=>{
+  if(attempt!==roomAttempt)return;
+  const wasHost=id===hostPeerId;const c=connections.get(id);if(c)c.open=false;connections.delete(id);
+  if(host){delete players[id];broadcast({type:'players',players:publicPlayers()});renderLobby();}
+  else if(wasHost){running=false;show('lobby');setStatus('lobbyStatus','Host disconnected. Do not wait—check the code and reconnect.');}
+  else {delete players[id];renderLobby();}
+ };
+ peer={destroy(){try{if(trRoom)trRoom.leave()}catch(e){}trRoom=null;trData=null;}};
+}
+async function createRoom(){
+ localName=$('playerName').value.trim()||'Player';setStatus('menuStatus','Opening a room…');
+ if(!(await loadTrystero()))return;
+ localId=trysteroSelfId;roomId=genRoom();host=true;hostPeerId='';matchStarted=false;running=false;crashed=false;
+ players={};grid=new Uint8Array(GRID*GRID);ownerIndex={};connections.clear();players[localId]=newPlayer(localId,localName,COLORS[0],WORLD*.5,WORLD*.5);
+ $('showRoomCode').textContent=roomId;$('roomCode').value=roomId;show('lobby');renderLobby();setStatus('lobbyStatus','Room is ready. Share the code and wait for 5 real players…');
+ enterRoomNetwork(roomId,true);renderLobby();
+}
+async function joinRoom(){
+ localName=$('playerName').value.trim()||'Player';const code=$('roomCode').value.trim().toUpperCase();
+ if(!code){setStatus('menuStatus','Enter a room code first.');return}
+ setStatus('menuStatus','Joining room…');if(!(await loadTrystero()))return;
+ localId=trysteroSelfId;roomId=code;host=false;hostPeerId='';matchStarted=false;running=false;crashed=false;players={};grid=new Uint8Array(GRID*GRID);connections.clear();
+ $('showRoomCode').textContent=code;show('lobby');setStatus('lobbyStatus','Searching for the host…');enterRoomNetwork(code,false);
+ const attempt=roomAttempt;
+ setTimeout(()=>{if(attempt===roomAttempt&&!hostPeerId&&!host&&!matchStarted&&!$('lobby').classList.contains('hidden'))setStatus('lobbyStatus','No host found yet. Check the room code. Do not wait for 30 minutes.');},12000);
+}
 function publicPlayers(){let o={};for(let [id,p] of Object.entries(players))o[id]={id:p.id,name:p.name,color:p.color,x:p.x,y:p.y,dir:p.dir,trail:p.trail,alive:p.alive,score:p.score,invuln:p.invuln};return o}
 function broadcast(data){for(let c of connections.values())if(c.open)try{c.send(data)}catch(e){}}
 function hostMessage(id,d){if(!d||!d.type)return;if(d.type==='join'){if(!players[id])players[id]=newPlayer(id,d.name,COLORS[Object.keys(players).length%COLORS.length]);let c=connections.get(id);if(c&&c.open)c.send({type:'welcome',id,hostId:localId,players:publicPlayers(),grid:Array.from(grid),started:matchStarted,shrinkAt});renderLobby();broadcast({type:'players',players:publicPlayers()});checkStart()}else if(d.type==='input'&&players[id]){players[id].input=d.input||{x:0,y:0};if(d.name)players[id].name=d.name}else if(d.type==='leave'){delete players[id];connections.delete(id);broadcast({type:'players',players:publicPlayers()});renderLobby()}}
@@ -53,16 +117,16 @@ if(now-lastBroadcast>100){lastBroadcast=now;broadcast({type:'state',players:publ
 function fillEnclosed(p,pi){ // flood-fill unclaimed areas connected to the outside; claim enclosed cells
  let seen=new Uint8Array(GRID*GRID),stack=[];for(let x=0;x<GRID;x++){if(grid[idx(x,0)]!==pi)stack.push(idx(x,0));if(grid[idx(x,GRID-1)]!==pi)stack.push(idx(x,GRID-1))}for(let y=0;y<GRID;y++){if(grid[idx(0,y)]!==pi)stack.push(idx(0,y));if(grid[idx(GRID-1,y)]!==pi)stack.push(idx(GRID-1,y))}while(stack.length){let c=stack.pop();if(c<0||c>=GRID*GRID||seen[c]||grid[c]===pi)continue;seen[c]=1;let x=c%GRID,y=Math.floor(c/GRID);if(x>0)stack.push(c-1);if(x<GRID-1)stack.push(c+1);if(y>0)stack.push(c-GRID);if(y<GRID-1)stack.push(c+GRID)}for(let c=0;c<grid.length;c++)if(grid[c]!==pi&&!seen[c]){grid[c]=pi;p.owned.push(c)}}
 function crashPlayer(p,msg){if(!p.alive)return;p.alive=false;p.trail=[];if(p.id===localId){crashed=true;running=false;$('crashMessage').textContent=msg;show('crash')}broadcast({type:'crash',id:p.id});if(host)broadcast({type:'state',players:publicPlayers(),grid:Array.from(grid),arenaInset,shrinkAt,started:matchStarted})}
-function frame(now){if(!running)return;let dt=now-lastFrame;lastFrame=now;if(host&&now-lastTick>TICK){lastTick=now;let inp=localInput();if(players[localId])players[localId].input=inp;step()}else if(!host){let c=connections.get(roomId);if(c&&c.open)c.send({type:'input',input:localInput(),name:localName})}draw();updateHud();requestAnimationFrame(frame)}
+function frame(now){if(!running)return;let dt=now-lastFrame;lastFrame=now;if(host&&now-lastTick>TICK){lastTick=now;let inp=localInput();if(players[localId])players[localId].input=inp;step()}else if(!host){let c=connections.get(hostPeerId);if(c&&c.open)c.send({type:'input',input:localInput(),name:localName})}draw();updateHud();requestAnimationFrame(frame)}
 function draw(){let w=innerWidth,h=innerHeight;ctx.clearRect(0,0,w,h);ctx.fillStyle='#f7fbff';ctx.fillRect(0,0,w,h);let scale=Math.min((w-20)/WORLD,(h-20)/WORLD),ox=(w-WORLD*scale)/2,oy=(h-WORLD*scale)/2;ctx.save();ctx.translate(ox,oy);ctx.scale(scale,scale);ctx.fillStyle='#edf4fb';ctx.fillRect(0,0,WORLD,WORLD);ctx.strokeStyle='#dce7f2';ctx.lineWidth=1;for(let x=0;x<=WORLD;x+=CELL*4){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,WORLD);ctx.stroke()}for(let y=0;y<=WORLD;y+=CELL*4){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(WORLD,y);ctx.stroke()}
  for(let c=0;c<grid.length;c++){let own=grid[c];if(own){let p=Object.values(players)[own-1];ctx.fillStyle=p?.color||COLORS[(own-1)%COLORS.length];ctx.globalAlpha=.77;ctx.fillRect((c%GRID)*CELL,(Math.floor(c/GRID))*CELL,CELL-1,CELL-1)}}ctx.globalAlpha=1;
  for(let p of Object.values(players)){if(!p.alive)continue;let color=p.color||'#ff4fa3';if(p.trail?.length){ctx.strokeStyle=color;ctx.lineWidth=5;ctx.lineCap='round';ctx.lineJoin='round';ctx.beginPath();ctx.moveTo(p.x,p.y);for(let c of p.trail)ctx.lineTo((c%GRID+.5)*CELL,(Math.floor(c/GRID)+.5)*CELL);ctx.lineTo(p.x,p.y);ctx.stroke()}if(performance.now()<(p.invuln||0)){ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.beginPath();ctx.arc(p.x,p.y,14,0,Math.PI*2);ctx.stroke()}ctx.fillStyle=color;ctx.beginPath();ctx.arc(p.x,p.y,9,0,Math.PI*2);ctx.fill();ctx.strokeStyle='white';ctx.lineWidth=3;ctx.stroke();ctx.fillStyle='#172033';ctx.font='bold 16px system-ui';ctx.textAlign='center';ctx.fillText(p.name,p.x,p.y-18)}
  if(arenaInset>0){ctx.strokeStyle='#ff6b6b';ctx.lineWidth=8;ctx.setLineDash([20,12]);ctx.strokeRect(arenaInset,arenaInset,WORLD-2*arenaInset,WORLD-2*arenaInset);ctx.setLineDash([])}ctx.restore()}
 function updateHud(){let p=players[localId];if(p){$('hudName').textContent=p.name;$('hudStats').textContent=`Territory: ${Math.round((p.score||0)/(GRID*GRID)*100)}%`;$('hudPlayers').textContent=`Players: ${Object.keys(players).length}/5`;}let left=Math.max(0,shrinkAt-performance.now());$('hudArena').textContent=arenaInset>=WORLD/2?'Arena closing':`Arena shrinks in ${String(Math.floor(left/60000)).padStart(2,'0')}:${String(Math.floor(left/1000)%60).padStart(2,'0')}`}
-$('createBtn').onclick=createRoom;$('joinBtn').onclick=joinRoom;$('copyCode').onclick=()=>{let text=$('showRoomCode').textContent;navigator.clipboard?.writeText(text).then(()=>say('Room code copied!')).catch(()=>say('Select and copy the room code above.'))};$('backMenu').onclick=leaveToMenu;$('leaveGame').onclick=leaveToLobby;$('leaveBtn').onclick=leaveToLobby;$('reviveBtn').onclick=revive;
-function revive(){if(host){let p=players[localId];if(!p)return;p.alive=true;p.x=WORLD/2;p.y=WORLD/2;p.dir={x:1,y:0};p.trail=[];p.invuln=performance.now()+3500;crashed=false;running=true;show('game');broadcast({type:'revive',id:localId});requestAnimationFrame(frame);say('Revived! You are briefly protected.')}else{let c=connections.get(roomId);if(c&&c.open)c.send({type:'reviveRequest'});else say('Connection lost. Leave and reconnect.');}}
-function leaveToLobby(){if(host){if(players[localId])delete players[localId];broadcast({type:'end'});}else{let c=connections.get(roomId);if(c&&c.open)c.send({type:'leave'})}running=false;crashed=false;matchStarted=false;show('lobby');renderLobby()}
-function leaveToMenu(){running=false;try{for(let c of connections.values())c.close();if(peer)peer.destroy()}catch(e){}connections.clear();players={};peer=null;host=false;matchStarted=false;crashed=false;show('menu');setStatus('menuStatus','Multiplayer needs an internet connection. No bots are used.')}
+$('createBtn').onclick=createRoom;$('joinBtn').onclick=joinRoom;$('copyCode').onclick=async()=>{let text=$('showRoomCode').textContent;try{if(navigator.clipboard&&navigator.clipboard.writeText){await navigator.clipboard.writeText(text);say('Room code copied!')}else{throw new Error('clipboard unavailable')}}catch(e){const r=document.createRange();r.selectNodeContents($('showRoomCode'));const sel=getSelection();sel.removeAllRanges();sel.addRange(r);say('Room code selected. Press Ctrl+C to copy.')}};$('backMenu').onclick=leaveToMenu;$('leaveGame').onclick=leaveToLobby;$('leaveBtn').onclick=leaveToLobby;$('reviveBtn').onclick=revive;
+function revive(){if(host){let p=players[localId];if(!p)return;p.alive=true;p.x=WORLD/2;p.y=WORLD/2;p.dir={x:1,y:0};p.trail=[];p.invuln=performance.now()+3500;crashed=false;running=true;show('game');broadcast({type:'revive',id:localId});requestAnimationFrame(frame);say('Revived! You are briefly protected.')}else{let c=connections.get(hostPeerId);if(c&&c.open)c.send({type:'reviveRequest'});else say('Connection lost. Leave and reconnect.');}}
+function leaveToLobby(){if(host){if(players[localId])delete players[localId];broadcast({type:'end'});}else{let c=connections.get(hostPeerId);if(c&&c.open)c.send({type:'leave'})}running=false;crashed=false;matchStarted=false;show('lobby');renderLobby()}
+function leaveToMenu(){roomAttempt++;running=false;try{for(let c of connections.values())c.close();if(peer)peer.destroy()}catch(e){}connections.clear();players={};peer=null;trRoom=null;trData=null;hostPeerId='';host=false;matchStarted=false;crashed=false;show('menu');setStatus('menuStatus','Create a room or enter a friend’s room code.')}
 // host handles revive requests without bots; revive the requesting human only.
 const oldHostMessage=hostMessage;hostMessage=function(id,d){if(d?.type==='reviveRequest'&&host&&players[id]){let p=players[id];p.alive=true;p.x=WORLD/2+rand(100)-50;p.y=WORLD/2+rand(100)-50;p.trail=[];p.dir={x:1,y:0};p.invuln=performance.now()+3500;let c=connections.get(id);if(c&&c.open)c.send({type:'revive',id});broadcast({type:'state',players:publicPlayers(),grid:Array.from(grid),arenaInset,shrinkAt,started:matchStarted});return}oldHostMessage(id,d)};
 // Host is the authoritative simulation. Start only when five genuine peer connections exist.

@@ -1,137 +1,282 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Color Clash — Paper Territory</title>
-<style>
-:root{--ink:#172033;--pink:#ff4fa3;--cyan:#21d4fd;--lime:#b8f34a;--orange:#ff9d42;--purple:#a78bfa}*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:#f7fbff;color:var(--ink)}button,input{font:inherit}button{border:0;border-radius:14px;padding:12px 17px;font-weight:900;cursor:pointer;box-shadow:0 5px 0 #17203322;transition:transform .08s}button:active{transform:translateY(3px);box-shadow:0 2px 0 #17203322}.primary{background:#b8f34a;color:#172033}.secondary{background:#fff;color:#172033;border:2px solid #e4eaf3}.danger{background:#ff6b6b;color:white}.panel{background:#ffffffed;border:2px solid #e4eaf3;border-radius:24px;padding:22px;box-shadow:0 18px 55px #243a5b20;max-width:460px;width:min(92vw,460px)}.screen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:16px;background:radial-gradient(circle at 15% 20%,#fff3a6 0,transparent 28%),radial-gradient(circle at 85% 75%,#b6f2ff 0,transparent 30%),#f7fbff;z-index:5}.hidden{display:none!important}.logo{font-size:clamp(32px,6vw,52px);font-weight:1000;line-height:.95;letter-spacing:-2px;margin:0}.logo span{color:#ff4fa3}.sub{color:#61708b;font-weight:650;line-height:1.45}.field{display:block;width:100%;padding:12px 14px;border:2px solid #e4eaf3;border-radius:12px;background:white;margin:7px 0 13px;outline-color:#21d4fd}.row{display:flex;gap:10px}.row>*{flex:1}.tiny{font-size:12px;color:#68758c;line-height:1.45}.pill{display:inline-flex;background:#f0f5fb;border-radius:99px;padding:6px 10px;font-size:12px;font-weight:900}.game{position:fixed;inset:0;background:#f7fbff}.game canvas{width:100%;height:100%;display:block;touch-action:none}.hud{position:absolute;inset:0;pointer-events:none;padding:14px;display:flex;justify-content:space-between;align-items:flex-start}.hudcard{background:#ffffffdf;backdrop-filter:blur(8px);border:2px solid #e5ebf3;border-radius:16px;padding:9px 12px;box-shadow:0 5px 15px #1720330d}.hud button{pointer-events:auto;padding:8px 12px}.hudright{display:flex;gap:8px;align-items:flex-start}.name{font-weight:950}.small{font-size:12px;color:#60708a;font-weight:700}.toast{position:absolute;top:84px;left:50%;transform:translateX(-50%);padding:9px 14px;border-radius:99px;background:#172033;color:white;font-size:13px;font-weight:850;white-space:nowrap;max-width:90vw;text-align:center}.crash-title{font-size:40px;line-height:1;margin:0 0 10px;font-weight:1000;letter-spacing:-1px}.crash-title span{color:#ff4f78}.status{font-weight:850;font-size:13px;margin:10px 0;color:#60708a;min-height:20px}.key{display:inline-block;border:1px solid #d7dfeb;background:white;border-radius:6px;padding:2px 6px;font-size:11px;font-weight:900}
-.hud{padding:18px;gap:12px}.hudcard{padding:12px 15px}.name{font-size:17px}.small{font-size:14px}.hudright{gap:10px}.hud button{padding:11px 16px;font-size:14px}
-.dpad{position:absolute;left:18px;bottom:18px;z-index:4;display:grid;grid-template-columns:repeat(3,64px);grid-template-rows:repeat(2,64px);gap:6px;touch-action:none;user-select:none}.control-btn{width:64px;height:64px;padding:0;border-radius:18px;background:#ffffffed;border:2px solid #dce6f2;color:#172033;font-size:30px;font-weight:1000;box-shadow:0 5px 0 #1720332a;touch-action:none;user-select:none;-webkit-user-select:none}.control-btn:active,.control-btn.pressed{background:#b8f34a;transform:translateY(2px);box-shadow:0 3px 0 #1720332a}.dpad .up{grid-column:2;grid-row:1}.dpad .left{grid-column:1;grid-row:2}.dpad .down{grid-column:2;grid-row:2}.dpad .right{grid-column:3;grid-row:2}.game canvas{cursor:crosshair}@media(max-width:600px){.dpad{left:10px;bottom:10px;grid-template-columns:repeat(3,56px);grid-template-rows:repeat(2,56px);gap:5px}.control-btn{width:56px;height:56px;font-size:27px}.hud{padding:8px}.hudcard{padding:8px 9px}.name{font-size:14px}.small{font-size:11px}.hud button{padding:8px 10px;font-size:12px}}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <meta name="theme-color" content="#070a1b">
+  <title>NEON WAVE — Levels & 5000m Race</title>
+  <style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+:root{color-scheme:dark;--bg:#070a1b;--panel:#10162b;--line:#273052;--cyan:#5df7ff;--pink:#ff4fbd;--text:#f5f7ff;--muted:#9ba7c9}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:radial-gradient(ellipse at 50% -20%,#20204c 0%,#0a0e22 48%,#050711 100%);color:var(--text);font-family:Inter,system-ui,sans-serif}
+body{padding:18px}.shell{width:min(1100px,100%);margin:0 auto}.topbar{display:flex;align-items:center;justify-content:space-between;margin:0 0 20px}.brand{display:flex;align-items:center;gap:12px}.brand-mark{color:var(--cyan);font-size:28px;text-shadow:0 0 16px var(--cyan)}.brand b{font:800 18px Orbitron,sans-serif;letter-spacing:2px;display:block}.brand small{display:block;color:var(--muted);font-size:10px;letter-spacing:2px;margin-top:4px}.pill{border:1px solid var(--line);border-radius:99px;padding:9px 12px;font-size:10px;letter-spacing:1.3px;color:#c8d4f7}.live-dot{display:inline-block;width:7px;height:7px;background:#55ffb0;border-radius:50%;margin-right:7px;box-shadow:0 0 10px #55ffb0}
+.panel{background:linear-gradient(145deg,rgba(20,27,53,.96),rgba(9,14,32,.96));border:1px solid var(--line);border-radius:22px;box-shadow:0 22px 70px #0005;padding:clamp(18px,4vw,38px);overflow:hidden}.home-panel{display:grid;grid-template-columns:1.05fr .95fr;gap:35px;min-height:480px;align-items:center}.eyebrow{font-size:10px;font-weight:800;letter-spacing:3px;color:var(--cyan);margin:0 0 12px}.hero-copy h1{font:800 clamp(38px,6vw,68px)/1.08 Orbitron,sans-serif;letter-spacing:-2px;margin:0 0 18px}.hero-copy h1 span{color:var(--pink);text-shadow:0 0 22px #ff4fbd55}.muted{color:var(--muted);line-height:1.7;max-width:420px;font-size:14px}.form-grid{background:#090e20aa;border:1px solid #293354;border-radius:18px;padding:22px;display:flex;flex-direction:column;gap:12px}.form-grid label,.room-code-card span,.hud-label{font-size:10px;letter-spacing:2px;color:var(--muted);font-weight:700}input{width:100%;background:#070b19;border:1px solid #2c385e;border-radius:10px;padding:14px;color:white;font:600 14px Inter;outline:none;min-width:0}input:focus{border-color:var(--cyan);box-shadow:0 0 0 3px #5df7ff16}.button-row,.join-row{display:flex;gap:10px}.join-row{margin-top:2px}button{font:700 11px Inter,sans-serif;letter-spacing:1px;border-radius:10px;padding:14px 16px;cursor:pointer;transition:transform .15s,filter .15s;border:1px solid transparent}button:hover{filter:brightness(1.12);transform:translateY(-1px)}button:active{transform:translateY(1px)}.primary{color:#07111d;background:linear-gradient(100deg,var(--cyan),#9affee);box-shadow:0 7px 22px #5df7ff22;flex:1}.secondary{color:#e5eaff;background:#171f3a;border-color:#334064;flex:1}.compact{padding:9px 12px;flex:0 0 auto}.small-note{font-size:11px;color:#8290b5;line-height:1.55;margin:4px 0 0}.hidden{display:none!important}.section-heading{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}.section-heading h2{font:700 clamp(24px,4vw,36px) Orbitron,sans-serif;margin:0}.icon-button{background:#1a2240;color:white;padding:10px 13px}.room-code-card{display:flex;align-items:center;gap:14px;background:#080d20;border:1px solid #283253;border-radius:13px;padding:16px;margin-bottom:20px}.room-code-card span{margin-right:auto}.room-code-card strong{font:700 19px Orbitron,sans-serif;letter-spacing:2px;color:var(--cyan)}.lobby-status{display:flex;align-items:center;color:#aab6d7;font-size:12px;margin:10px 0 14px}.lobby-status b{margin-left:auto;color:white}.roster{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px}.roster-slot{border:1px solid #293657;background:#0a1024;border-radius:12px;padding:18px 8px;text-align:center;min-height:94px}.roster-slot .avatar{font-size:24px;margin-bottom:9px}.roster-slot strong{display:block;font-size:11px;overflow-wrap:anywhere}.roster-slot small{display:block;color:#7583a8;font-size:9px;margin-top:5px}.roster-slot.empty{opacity:.45;border-style:dashed}.game-panel{padding:16px}.game-hud{display:flex;align-items:center;gap:22px;padding:8px 5px 15px}.game-hud>div:first-child,.game-hud>div:last-child{min-width:90px}.game-hud strong{display:block;font:700 18px Orbitron,sans-serif;margin-top:5px}.progress-wrap{flex:1}.progress-track{height:7px;background:#252d4b;border-radius:20px;overflow:hidden}.progress-track div{height:100%;width:0;background:linear-gradient(90deg,var(--pink),var(--cyan));box-shadow:0 0 14px var(--cyan);transition:width .1s}.progress-wrap span{display:block;text-align:center;font-size:9px;letter-spacing:2px;color:#8290b5;margin-top:7px}.canvas-wrap{position:relative;border:1px solid #283354;border-radius:13px;overflow:hidden;background:#070b1b;touch-action:none}canvas{display:block;width:100%;height:auto;aspect-ratio:16/9;touch-action:none}.overlay{position:absolute;inset:0;display:grid;place-items:center;background:#0508179c;padding:15px}.overlay.hidden{display:none!important}.overlay-card{max-width:360px;text-align:center;background:#10172deF;border:1px solid #354267;border-radius:17px;padding:25px;box-shadow:0 10px 40px #0007}.overlay-card h2{font:800 clamp(24px,4vw,40px) Orbitron,sans-serif;margin:0 0 10px}.overlay-card p:not(.eyebrow){color:#a9b5d6;font-size:12px;line-height:1.6}.overlay-card button{width:100%;margin-top:10px}.level-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:12px 0}.level-grid button{padding:10px 4px;font-size:9px}.level-grid button:disabled{opacity:.4;cursor:not-allowed}.game-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:13px 3px 3px}.game-controls>span{font-size:10px;color:#9aa7c9;letter-spacing:.5px;margin-right:auto}kbd{background:#202a49;border:1px solid #3a486f;padding:3px 6px;border-radius:4px;color:#fff}footer{text-align:center;color:#667395;font-size:10px;letter-spacing:1.5px;padding:18px}footer span{color:var(--pink)}
+@media(max-width:760px){body{padding:10px}.home-panel{grid-template-columns:1fr;gap:20px}.hero-copy h1{font-size:43px}.roster{grid-template-columns:repeat(2,1fr)}.roster-slot:last-child{grid-column:span 2}.room-code-card{flex-wrap:wrap}.room-code-card span{width:100%}.room-code-card strong{margin-right:auto}.game-hud{gap:10px}.game-hud>div:first-child,.game-hud>div:last-child{min-width:70px}.game-hud strong{font-size:13px}.hud-label{font-size:8px}.game-controls>span{width:100%;margin-bottom:3px}.button-row{flex-wrap:wrap}.button-row button{min-height:44px}}
+
 </style>
 </head>
 <body>
-<div id="menu" class="screen"><div class="panel">
- <div class="pill">✨ BRIGHT 2D TERRITORY BATTLE</div><h1 class="logo" style="margin-top:14px">COLOR <span>CLASH</span></h1><p class="sub">Draw trails, close loops, and claim the map. Don't let another player hit your exposed trail!</p>
- <label class="tiny" for="playerName">YOUR PLAYER NAME</label><input id="playerName" class="field" maxlength="16" placeholder="Type your name" value="Player">
- <button id="createBtn" class="primary" style="width:100%;margin-bottom:10px">CREATE MULTIPLAYER ROOM</button>
- <label class="tiny" for="roomCode">JOIN A FRIEND'S ROOM CODE</label><input id="roomCode" class="field" maxlength="60" placeholder="Paste host room code">
- <button id="joinBtn" class="secondary" style="width:100%">JOIN ROOM</button>
- <div class="status" id="menuStatus">Room networking uses public relay discovery. No bots are used.</div>
- <div class="tiny">Controls: <span class="key">WASD</span> / <span class="key">↑ ↓ ← →</span> or drag on mobile. No food, energy, or power-up cubes.</div>
- </div></div>
-<div id="lobby" class="screen hidden"><div class="panel" style="text-align:center"><div class="pill">👥 MULTIPLAYER LOBBY</div><h2 style="font-size:32px;margin:12px 0 4px">Gather your crew!</h2><p class="sub">The match starts automatically when <b>5 real players</b> are connected. There are no AI bots.</p><div style="font-size:13px;color:#61708b;font-weight:800;margin:14px 0 5px">ROOM CODE — SHARE WITH FRIENDS</div><div id="showRoomCode" style="font-size:19px;font-weight:1000;overflow-wrap:anywhere;background:#f0f5fb;border-radius:12px;padding:12px;user-select:all">Connecting…</div><button id="copyCode" class="secondary" style="margin-top:10px">COPY ROOM CODE</button><div id="playerList" style="margin:16px 0;text-align:left;background:#f8fafc;border-radius:14px;padding:12px;font-weight:800">Connecting…</div><div id="lobbyStatus" class="status">Waiting for 5 real players…</div><button id="backMenu" class="secondary" style="width:100%">LEAVE LOBBY</button></div></div>
-<div id="game" class="game hidden"><canvas id="canvas"></canvas><div class="hud"><div class="hudcard"><div class="name" id="hudName">Player</div><div class="small" id="hudStats">Territory: 0%</div><div class="small" id="hudArena">Arena shrinks in 05:00</div></div><div class="hudright"><div class="hudcard small" id="hudPlayers">Players: 1/5</div><button id="leaveGame" class="danger">LEAVE</button></div></div><div class="dpad" id="dpad" aria-label="Movement controls"><button class="control-btn up" data-key="ArrowUp" aria-label="Move up">▲</button><button class="control-btn left" data-key="ArrowLeft" aria-label="Move left">◀</button><button class="control-btn down" data-key="ArrowDown" aria-label="Move down">▼</button><button class="control-btn right" data-key="ArrowRight" aria-label="Move right">▶</button></div><div id="toast" class="toast hidden"></div></div>
-<div id="crash" class="screen hidden"><div class="panel" style="text-align:center"><div style="font-size:56px">💥</div><h2 class="crash-title">YOU <span>CRASHED!</span></h2><p id="crashMessage" class="sub">Your trail was hit! Want to try again?</p><button id="reviveBtn" class="primary" style="width:100%;font-size:18px;margin:8px 0">↻ REVIVE</button><button id="leaveBtn" class="danger" style="width:100%;font-size:18px">↗ LEAVE MATCH</button><p class="tiny" style="margin-top:13px">Revive respawns you safely. Leaving returns you to the lobby.</p></div></div>
-<script type="module">
-(()=>{'use strict';
-const $=id=>document.getElementById(id), screens=['menu','lobby','game','crash'];const show=id=>screens.forEach(s=>$(s).classList.toggle('hidden',s!==id));
-const canvas=$('canvas'),ctx=canvas.getContext('2d',{alpha:false});const WORLD=1400,CELL=14,GRID=Math.floor(WORLD/CELL),TICK=70,SHRINK_MS=300000,ZOOM=1.08;const COLORS=['#ff4fa3','#21b9e9','#ff9d42','#8d6bff','#54c77a','#f35e6d','#e5bd22','#36b8a4'];const SPAWNS=[[220,220],[1180,220],[1180,1180],[220,1180],[700,700]];let cameraX=WORLD/2,cameraY=WORLD/2;
-let peer=null,host=false,roomId='',connections=new Map(),localId='',players={},running=false,crashed=false,matchStarted=false,lastTick=0,lastBroadcast=0,lastGridBroadcast=0,shrinkAt=0,arenaInset=0,keys={},touchTarget=null,touchSteering=false,toastTimer=0,gameMode='online',lastFrame=0,lastInputSend=0;
-let trysteroJoinRoom=null, trysteroSelfId='', trRoom=null, trData=null, hostPeerId='', roomAttempt=0;
-let grid=new Uint8Array(GRID*GRID),ownerIndex={},localName='Player';const idx=(x,y)=>y*GRID+x;const rand=(n)=>Math.floor(Math.random()*n);const playerCount=()=>Object.keys(players).filter(id=>players[id]&&players[id].alive).length;
-function resize(){let dpr=Math.min(devicePixelRatio||1,1.5);canvas.width=Math.floor(innerWidth*dpr);canvas.height=Math.floor(innerHeight*dpr);ctx.setTransform(dpr,0,0,dpr,0,0)}addEventListener('resize',resize);resize();
-function say(msg){$('toast').textContent=msg;$('toast').classList.remove('hidden');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.add('hidden'),2300)}
-function setStatus(id,msg){$(id).textContent=msg}
-function genRoom(){return Math.random().toString(36).slice(2,7).toUpperCase()}
-function newPlayer(id,name,color,x,y,slot){const nslot=slot||Math.max(1,Object.keys(players).length+1);const spawn=SPAWNS[(nslot-1)%SPAWNS.length];return {id,slot:nslot,name:(name||'Player').slice(0,16),color:color||COLORS[(nslot-1)%COLORS.length],x:x??spawn[0],y:y??spawn[1],dir:{x:1,y:0},trail:[],owned:[],alive:true,score:0,invuln:performance.now()+3500,input:{x:0,y:0}}}
-function setupPeer(){return true}
-async function loadTrystero(){
- if(trysteroJoinRoom&&trysteroSelfId)return true;
- try{
-  const mod=await import('https://esm.run/trystero@0.26.0');
-  trysteroJoinRoom=mod.joinRoom;trysteroSelfId=mod.selfId;
-  if(!trysteroJoinRoom||!trysteroSelfId)throw new Error('The room networking library did not load correctly.');
-  return true;
- }catch(e){setStatus('menuStatus','Could not load multiplayer networking. Check your internet and reopen the game.');return false}
-}
-function makeConnection(id){
- let existing=connections.get(id);if(existing){existing.open=true;return existing}
- const conn={peer:id,open:true,send(data){if(this.open&&trData)try{trData.send(data,{target:id})}catch(e){}},close(){this.open=false}};
- connections.set(id,conn);return conn;
-}
-function enterRoomNetwork(code,isHost){
- roomAttempt++;const attempt=roomAttempt;
- try{if(trRoom)trRoom.leave()}catch(e){}
- host=isHost;roomId=code;hostPeerId='';connections=new Map();
- trRoom=trysteroJoinRoom({appId:'com.colorclash.paperterritory.game.v2'},code,{
-  onJoinError:({peerId,error})=>{
-   if(attempt!==roomAttempt)return;
-   const msg='Could not connect to a player. Check your internet/network, then try a new room.';
-   setStatus('lobbyStatus',msg);
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark">◆</span><div><b>NEON WAVE</b><small>LEVELS + 5000M RACE</small></div></div>
+      <div class="pill"><span class="live-dot"></span> ARCADE BUILD</div>
+    </header>
+
+    <section id="home" class="panel home-panel">
+      <div class="hero-copy">
+        <p class="eyebrow">DODGE. SURVIVE. FINISH.</p>
+        <h1>Own the<br><span>neon tunnel.</span></h1>
+        <p class="muted">Choose your challenge: play classic levels that get harder, or take on the full 5,000-metre race. Hold to rise and release to fall!</p>
+      </div>
+      <div class="form-grid">
+        <label for="playerName">PLAYER NAME</label>
+        <input id="playerName" maxlength="16" value="Pilot" autocomplete="nickname" placeholder="Enter a name">
+        <div class="button-row">
+          <button id="levelsBtn" class="primary">▶ NORMAL LEVELS</button>
+          <button id="raceBtn" class="secondary">🏁 5000 M RACE</button>
+          <button id="createBtn" class="secondary">＋ CREATE ROOM</button>
+        </div>
+        <div class="join-row">
+          <input id="roomInput" maxlength="8" placeholder="ROOM CODE" aria-label="Room code">
+          <button id="joinBtn" class="secondary">JOIN ROOM</button>
+        </div>
+        <p class="small-note">Practice is playable immediately. Room-code screens are included; live cross-device races need a signaling/network service.</p>
+      </div>
+    </section>
+
+    <section id="lobby" class="panel lobby-panel hidden">
+      <div class="section-heading"><div><p class="eyebrow">RACE LOBBY</p><h2>Ready up, pilots.</h2></div><button id="backBtn" class="icon-button" aria-label="Back to menu">✕</button></div>
+      <div class="room-code-card"><span>ROOM CODE</span><strong id="roomCode">WAVE-000</strong><button id="copyCodeBtn" class="secondary compact">COPY</button></div>
+      <div class="lobby-status"><span class="live-dot"></span><span id="lobbyStatus">Waiting for pilots</span><b id="playerCount">1 / 5</b></div>
+      <div id="roster" class="roster"></div>
+      <div class="button-row">
+        <button id="startLobbyBtn" class="primary">▶ START PRACTICE RACE</button>
+        <button id="leaveRoomBtn" class="secondary">LEAVE ROOM</button>
+      </div>
+      <p class="small-note">This build does not pretend that remote players are connected. The room UI is ready, but genuine five-person matchmaking requires the networking module and a deployed signaling service.</p>
+    </section>
+
+    <section id="gamePanel" class="panel game-panel hidden">
+      <div class="game-hud">
+        <div><span class="hud-label">DISTANCE</span><strong id="distanceText">0 m</strong></div>
+        <div class="progress-wrap"><div class="progress-track"><div id="progressFill"></div></div><span id="progressLabel">5000 M FINISH</span></div>
+        <div><span class="hud-label">STATUS</span><strong id="statusText">READY</strong></div>
+      </div>
+      <div class="canvas-wrap">
+        <canvas id="gameCanvas" width="960" height="540" aria-label="Neon Wave game area"></canvas>
+        <div id="overlay" class="overlay">
+          <div class="overlay-card"><p class="eyebrow">READY, PILOT?</p><h2>5000 metres.</h2><p>Hold the screen, mouse button, or SPACE to rise. Release to fall.</p><button id="beginBtn" class="primary">START RACE</button></div>
+        </div>
+      </div>
+      <div class="game-controls"><span>HOLD <kbd>SPACE</kbd> / MOUSE / TOUCH TO RISE</span><button id="pauseBtn" class="secondary compact">Ⅱ PAUSE</button><button id="retryBtn" class="secondary compact">↻ RESTART</button><button id="menuBtn" class="secondary compact">MENU</button></div>
+      <p id="gameMessage" class="small-note">Tip: short taps help you thread through tight gaps.</p>
+    </section>
+    <footer>NEON WAVE <span>•</span> Lightweight HTML5 Canvas build</footer>
+  </main>
+  <script>
+(() => {
+  "use strict";
+  const $ = id => document.getElementById(id);
+  const home = $("home"), lobby = $("lobby"), gamePanel = $("gamePanel");
+  const canvas = $("gameCanvas"), ctx = canvas.getContext("2d");
+  const W = canvas.width, H = canvas.height;
+  let currentRoom = "", playerName = "Pilot", gameState = "ready";
+  let holding = false, paused = false, raf = 0, lastTime = 0, distance = 0;
+  let ship = {x:170,y:H/2,vy:0,r:13}, obstacles = [], particles = [], elapsed = 0, lastSpawn = 0;
+  let practice = true, countdown = 0, score = 0, crashed = false;
+  let mode = "race", level = 1, targetDistance = 5000;
+  let unlockedLevel = Math.max(1, Number(localStorage.getItem("neonWaveUnlockedLevel") || 1));
+  const colors = ["#5df7ff","#ff4fbd","#b6ff5d","#b18cff","#ffb45d"];
+  const clamp = (v,a,b) => Math.max(a,Math.min(b,v));
+  const rand = (a,b) => a + Math.random()*(b-a);
+  function show(which){ [home,lobby,gamePanel].forEach(s=>s.classList.add("hidden")); which.classList.remove("hidden"); }
+  function randomCode(){ return "WAVE-" + Math.random().toString(36).slice(2,5).toUpperCase(); }
+  function renderRoster(){
+    const roster = $("roster"); roster.innerHTML = "";
+    for(let i=0;i<5;i++){
+      const occupied = i===0;
+      const slot = document.createElement("div");
+      slot.className = "roster-slot" + (occupied ? "" : " empty");
+      slot.innerHTML = `<div class="avatar">${occupied ? "🚀" : "＋"}</div><strong>${occupied ? escapeHtml(playerName) : "Open slot"}</strong><small>${occupied ? "YOU · READY" : "WAITING FOR PLAYER"}</small>`;
+      roster.appendChild(slot);
+    }
+    $("playerCount").textContent = "1 / 5";
+    $("lobbyStatus").textContent = "Waiting for pilots";
   }
- });
- trData=trRoom.makeAction('color-clash-game-message-v2');
- trData.onMessage=(data,meta)=>{
-  const from=meta&&meta.peerId;if(!from||!data||attempt!==roomAttempt)return;
-  if(data.type==='hello'){
-   if(!host&&data.isHost){hostPeerId=from;makeConnection(from).send({type:'join',name:localName});setStatus('lobbyStatus','Connected to host! Joining lobby…')}
-   return;
+  function escapeHtml(s){return s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+  function enterLobby(code){
+    playerName = ($("playerName").value.trim() || "Pilot").slice(0,16);
+    currentRoom = code || randomCode();
+    $("roomCode").textContent = currentRoom;
+    renderRoster(); show(lobby);
   }
-  if(host)hostMessage(from,data);
-  else if(from===hostPeerId)clientMessage(data);
- };
- trRoom.onPeerJoin=(id)=>{
-  if(attempt!==roomAttempt)return;
-  const conn=makeConnection(id);
-  conn.send({type:'hello',id:localId,isHost:host,name:localName});
- };
- trRoom.onPeerLeave=(id)=>{
-  if(attempt!==roomAttempt)return;
-  const wasHost=id===hostPeerId;const c=connections.get(id);if(c)c.open=false;connections.delete(id);
-  if(host){delete players[id];broadcast({type:'players',players:publicPlayers()});renderLobby();}
-  else if(wasHost){running=false;show('lobby');setStatus('lobbyStatus','Host disconnected. Do not wait—check the code and reconnect.');}
-  else {delete players[id];renderLobby();}
- };
- peer={destroy(){try{if(trRoom)trRoom.leave()}catch(e){}trRoom=null;trData=null;}};
-}
-async function createRoom(){
- localName=$('playerName').value.trim()||'Player';setStatus('menuStatus','Opening a room…');
- if(!(await loadTrystero()))return;
- localId=trysteroSelfId;roomId=genRoom();host=true;hostPeerId='';matchStarted=false;running=false;crashed=false;
- players={};grid=new Uint8Array(GRID*GRID);ownerIndex={};connections.clear();players[localId]=newPlayer(localId,localName,COLORS[0],SPAWNS[0][0],SPAWNS[0][1],1);
- $('showRoomCode').textContent=roomId;$('roomCode').value=roomId;show('lobby');renderLobby();setStatus('lobbyStatus','Room is ready. Share the code and wait for 5 real players…');
- enterRoomNetwork(roomId,true);renderLobby();
-}
-async function joinRoom(){
- localName=$('playerName').value.trim()||'Player';const code=$('roomCode').value.trim().toUpperCase();
- if(!code){setStatus('menuStatus','Enter a room code first.');return}
- setStatus('menuStatus','Joining room…');if(!(await loadTrystero()))return;
- localId=trysteroSelfId;roomId=code;host=false;hostPeerId='';matchStarted=false;running=false;crashed=false;players={};grid=new Uint8Array(GRID*GRID);connections.clear();
- $('showRoomCode').textContent=code;show('lobby');setStatus('lobbyStatus','Searching for the host…');enterRoomNetwork(code,false);
- const attempt=roomAttempt;
- setTimeout(()=>{if(attempt===roomAttempt&&!hostPeerId&&!host&&!matchStarted&&!$('lobby').classList.contains('hidden'))setStatus('lobbyStatus','No host found yet. Check the room code. Do not wait for 30 minutes.');},12000);
-}
-function publicPlayers(){let o={};for(let [id,p] of Object.entries(players))o[id]={id:p.id,slot:p.slot||Object.keys(players).indexOf(id)+1,name:p.name,color:p.color,x:p.x,y:p.y,dir:p.dir,trail:p.trail,alive:p.alive,score:p.score,invuln:p.invuln};return o}
-function broadcast(data){for(let c of connections.values())if(c.open)try{c.send(data)}catch(e){}}
-function hostMessage(id,d){if(!d||!d.type)return;if(d.type==='join'){if(!players[id]){const slot=Object.keys(players).length+1;const spawn=SPAWNS[(slot-1)%SPAWNS.length];players[id]=newPlayer(id,d.name,COLORS[(slot-1)%COLORS.length],spawn[0],spawn[1],slot);}let c=connections.get(id);if(c&&c.open)c.send({type:'welcome',id,hostId:localId,players:publicPlayers(),grid:Array.from(grid),started:matchStarted,shrinkAt});renderLobby();broadcast({type:'players',players:publicPlayers()});checkStart()}else if(d.type==='input'&&players[id]){players[id].input=d.input||{x:0,y:0};if(d.name)players[id].name=d.name}else if(d.type==='leave'){delete players[id];connections.delete(id);broadcast({type:'players',players:publicPlayers()});renderLobby()}}
-function clientMessage(d){if(!d)return;if(d.type==='welcome'){if(d.error){setStatus('lobbyStatus',d.error);return}localId=d.id||localId;players=d.players||{};grid=new Uint8Array(d.grid||GRID*GRID);shrinkAt=d.shrinkAt||0;matchStarted=!!d.started;show('lobby');renderLobby();if(matchStarted)startGame(false)}else if(d.type==='players'){players=d.players||players;renderLobby();if(host)checkStart()}else if(d.type==='state'){players=d.players||players;if(d.grid)grid=new Uint8Array(d.grid);arenaInset=d.arenaInset||0;shrinkAt=d.shrinkAt||shrinkAt;if(d.crashed===localId){crashed=true;running=false;show('crash')}if(d.started&&!running&&!crashed)startGame(false);updateHud()}else if(d.type==='start'){players=d.players||players;grid=new Uint8Array(d.grid||GRID*GRID);matchStarted=true;shrinkAt=d.shrinkAt;startGame(false)}else if(d.type==='crash'&&d.id===localId){crashed=true;running=false;show('crash')}else if(d.type==='revive'){if(players[d.id]){players[d.id].alive=true;players[d.id].trail=[]}if(d.id===localId){crashed=false;startGame(false)}show('game')}else if(d.type==='end'){running=false;show('lobby')}}
-function renderLobby(){let arr=Object.values(players);$('playerList').innerHTML=arr.map((p,i)=>`<div style="display:flex;align-items:center;gap:8px;padding:6px 0"><span style="width:12px;height:12px;border-radius:50%;background:${p.color||COLORS[i%COLORS.length]};display:inline-block"></span><span>${escapeHtml(p.name||'Player')}</span><span style="margin-left:auto;color:#7a879a;font-size:12px">${p.id===localId?'YOU':p.id===roomId&&host?'HOST':'CONNECTED'}</span></div>`).join('')||'Waiting for players…';$('hudPlayers').textContent=`Players: ${arr.length}/5`;if(arr.length>=5)setStatus('lobbyStatus','Crew ready! Starting match…');else setStatus('lobbyStatus',`Waiting for ${5-arr.length} more real player${5-arr.length===1?'':'s'}…`)}
-function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function checkStart(){if(!host||matchStarted||Object.keys(players).length<5)return;matchStarted=true;grid=new Uint8Array(GRID*GRID);for(let [id,p] of Object.entries(players)){p.alive=true;p.trail=[];p.owned=[];let gx=Math.floor(p.x/CELL),gy=Math.floor(p.y/CELL);claimStart(p,gx,gy)}shrinkAt=Date.now()+SHRINK_MS;broadcast({type:'start',players:publicPlayers(),grid:Array.from(grid),shrinkAt});startGame(true)}
-function claimStart(p,gx,gy){let pi=p.slot||Object.keys(players).indexOf(p.id)+1;for(let y=Math.max(0,gy-3);y<Math.min(GRID,gy+4);y++)for(let x=Math.max(0,gx-3);x<Math.min(GRID,gx+4);x++){grid[idx(x,y)]=pi;p.owned.push(idx(x,y))}p.score=p.owned.length}
-function startGame(isHost){if(!players[localId]){const slot=Math.max(1,Object.keys(players).length+1);const spawn=SPAWNS[(slot-1)%SPAWNS.length];players[localId]=newPlayer(localId,localName,COLORS[(slot-1)%COLORS.length],spawn[0],spawn[1],slot);}if(!players[localId].alive){crashed=true;show('crash');return}crashed=false;running=true;show('game');$('hudName').textContent=players[localId].name;$('hudStats').textContent='Territory: 0%';$('hudArena').textContent='Arena shrinks in 05:00';lastTick=performance.now();lastFrame=lastTick;requestAnimationFrame(frame);say('Use WASD, arrow keys, or the big arrow buttons to move!')}
-function localInput(){let x=0,y=0;if(keys.ArrowLeft||keys.a||keys.A)x=-1;if(keys.ArrowRight||keys.d||keys.D)x=1;if(keys.ArrowUp||keys.w||keys.W)y=-1;if(keys.ArrowDown||keys.s||keys.S)y=1;if(x&&y){if(Math.abs(players[localId]?.dir.x||1)>Math.abs(players[localId]?.dir.y||0))y=0;else x=0}if(touchSteering&&touchTarget){let p=players[localId];if(p){let dx=touchTarget.x-p.x,dy=touchTarget.y-p.y;if(Math.abs(dx)>10||Math.abs(dy)>10){if(Math.abs(dx)>Math.abs(dy))x=Math.sign(dx),y=0;else y=Math.sign(dy),x=0}}}return{x,y}}
-addEventListener('keydown',e=>{if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown',' '].includes(e.key))e.preventDefault();keys[e.key]=true});addEventListener('keyup',e=>keys[e.key]=false);const worldFromPointer=e=>{const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left-r.width/2)/ZOOM+cameraX,y:(e.clientY-r.top-r.height/2)/ZOOM+cameraY}};canvas.addEventListener('pointerdown',e=>{touchTarget=worldFromPointer(e);touchSteering=true;try{canvas.setPointerCapture?.(e.pointerId)}catch(_){}});canvas.addEventListener('pointermove',e=>{if(e.buttons)touchTarget=worldFromPointer(e)});canvas.addEventListener('pointerup',()=>touchSteering=false);canvas.addEventListener('pointercancel',()=>touchSteering=false);document.querySelectorAll('.control-btn').forEach(btn=>{const press=e=>{e.preventDefault();keys[btn.dataset.key]=true;btn.classList.add('pressed')};const release=e=>{e.preventDefault();keys[btn.dataset.key]=false;btn.classList.remove('pressed')};btn.addEventListener('pointerdown',press);btn.addEventListener('pointerup',release);btn.addEventListener('pointercancel',release);btn.addEventListener('pointerleave',release);btn.addEventListener('contextmenu',e=>e.preventDefault())});
-function setDir(p,input){if(!input)return;let x=input.x||0,y=input.y||0;if(x&&p.dir.x===-x&&p.dir.y===0)return;if(y&&p.dir.y===-y&&p.dir.x===0)return;if(x||y)p.dir={x,y}}
-function step(){if(!host||!running)return;let now=performance.now();for(let p of Object.values(players)){if(!p.alive)continue;setDir(p,p.input);let speed=3.1;p.x+=p.dir.x*speed;p.y+=p.dir.y*speed;let gx=Math.floor(p.x/CELL),gy=Math.floor(p.y/CELL);if(p.x<arenaInset+8||p.y<arenaInset+8||p.x>WORLD-arenaInset-8||p.y>WORLD-arenaInset-8||gx<0||gy<0||gx>=GRID||gy>=GRID){crashPlayer(p,'You hit the arena edge!');continue}let cell=idx(gx,gy),pi=p.slot||Object.keys(players).indexOf(p.id)+1;if(grid[cell]!==pi){if(!p.trail.includes(cell))p.trail.push(cell);for(let q of Object.values(players)){if(q.id!==p.id&&q.alive&&performance.now()>(q.invuln||0)&&q.trail.includes(cell)){crashPlayer(q,'Another player cut your trail!')}}}else if(p.trail.length){for(let c of p.trail){grid[c]=pi;p.owned.push(c)}p.trail=[];p.score=p.owned.length;fillEnclosed(p,pi);p.score=p.owned.length}}
-if(shrinkAt&&Date.now()>=shrinkAt){arenaInset+=CELL*2;shrinkAt=Date.now()+SHRINK_MS;for(let p of Object.values(players))if(p.alive&&(p.x<arenaInset||p.y<arenaInset||p.x>WORLD-arenaInset||p.y>WORLD-arenaInset))crashPlayer(p,'The arena shrank around you!');say('⚠️ Arena shrinking! Stay inside!')}
-if(now-lastBroadcast>100){lastBroadcast=now;const state={type:'state',players:publicPlayers(),arenaInset,shrinkAt,started:matchStarted};if(now-lastGridBroadcast>700){state.grid=Array.from(grid);lastGridBroadcast=now}broadcast(state)}}
-function fillEnclosed(p,pi){ // flood-fill unclaimed areas connected to the outside; claim enclosed cells
- let seen=new Uint8Array(GRID*GRID),stack=[];for(let x=0;x<GRID;x++){if(grid[idx(x,0)]!==pi)stack.push(idx(x,0));if(grid[idx(x,GRID-1)]!==pi)stack.push(idx(x,GRID-1))}for(let y=0;y<GRID;y++){if(grid[idx(0,y)]!==pi)stack.push(idx(0,y));if(grid[idx(GRID-1,y)]!==pi)stack.push(idx(GRID-1,y))}while(stack.length){let c=stack.pop();if(c<0||c>=GRID*GRID||seen[c]||grid[c]===pi)continue;seen[c]=1;let x=c%GRID,y=Math.floor(c/GRID);if(x>0)stack.push(c-1);if(x<GRID-1)stack.push(c+1);if(y>0)stack.push(c-GRID);if(y<GRID-1)stack.push(c+GRID)}for(let c=0;c<grid.length;c++)if(grid[c]!==pi&&!seen[c]){grid[c]=pi;p.owned.push(c)}}
-function crashPlayer(p,msg){if(!p.alive)return;p.alive=false;p.trail=[];if(p.id===localId){crashed=true;running=false;$('crashMessage').textContent=msg;show('crash')}broadcast({type:'crash',id:p.id});if(host)broadcast({type:'state',players:publicPlayers(),grid:Array.from(grid),arenaInset,shrinkAt,started:matchStarted})}
-function frame(now){if(!running)return;let dt=now-lastFrame;lastFrame=now;if(host&&now-lastTick>TICK){lastTick=now;let inp=localInput();if(players[localId])players[localId].input=inp;step()}else if(!host&&now-lastInputSend>50){lastInputSend=now;let c=connections.get(hostPeerId);if(c&&c.open)c.send({type:'input',input:localInput(),name:localName})}draw();updateHud();requestAnimationFrame(frame)}
-function draw(){const w=innerWidth,h=innerHeight;ctx.clearRect(0,0,w,h);ctx.fillStyle='#f7fbff';ctx.fillRect(0,0,w,h);const pLocal=players[localId];const targetX=pLocal?.x??WORLD/2,targetY=pLocal?.y??WORLD/2;const halfW=w/(2*ZOOM),halfH=h/(2*ZOOM);cameraX=WORLD<=2*halfW?WORLD/2:Math.max(halfW,Math.min(WORLD-halfW,targetX));cameraY=WORLD<=2*halfH?WORLD/2:Math.max(halfH,Math.min(WORLD-halfH,targetY));ctx.save();ctx.translate(w/2-cameraX*ZOOM,h/2-cameraY*ZOOM);ctx.scale(ZOOM,ZOOM);ctx.fillStyle='#edf4fb';ctx.fillRect(0,0,WORLD,WORLD);ctx.save();ctx.beginPath();ctx.rect(0,0,WORLD,WORLD);ctx.clip();ctx.strokeStyle='#d2e2f1';ctx.lineWidth=1;for(let x=0;x<=WORLD;x+=CELL*4){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,WORLD);ctx.stroke()}for(let y=0;y<=WORLD;y+=CELL*4){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(WORLD,y);ctx.stroke()}
- const playersBySlot={};for(const q of Object.values(players))playersBySlot[q.slot||Object.keys(players).indexOf(q.id)+1]=q;const minX=Math.max(0,Math.floor((cameraX-halfW)/CELL)),maxX=Math.min(GRID-1,Math.ceil((cameraX+halfW)/CELL)),minY=Math.max(0,Math.floor((cameraY-halfH)/CELL)),maxY=Math.min(GRID-1,Math.ceil((cameraY+halfH)/CELL));for(let gy=minY;gy<=maxY;gy++)for(let gx=minX;gx<=maxX;gx++){const own=grid[idx(gx,gy)];if(own){const owner=playersBySlot[own];ctx.fillStyle=owner?.color||COLORS[(own-1)%COLORS.length];ctx.globalAlpha=.88;ctx.fillRect(gx*CELL,gy*CELL,CELL-1,CELL-1)}}ctx.globalAlpha=1;
- for(const q of Object.values(players)){if(!q.alive)continue;const color=q.color||'#ff4fa3';if(q.trail?.length){ctx.strokeStyle=color;ctx.lineWidth=5;ctx.lineCap='round';ctx.lineJoin='round';ctx.beginPath();ctx.moveTo(q.x,q.y);for(const c of q.trail)ctx.lineTo((c%GRID+.5)*CELL,(Math.floor(c/GRID)+.5)*CELL);ctx.lineTo(q.x,q.y);ctx.stroke()}if(performance.now()<(q.invuln||0)){ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.beginPath();ctx.arc(q.x,q.y,15,0,Math.PI*2);ctx.stroke()}ctx.fillStyle=color;ctx.beginPath();ctx.arc(q.x,q.y,10,0,Math.PI*2);ctx.fill();ctx.strokeStyle='white';ctx.lineWidth=3;ctx.stroke();ctx.fillStyle='#172033';ctx.font='900 20px system-ui';ctx.textAlign='center';ctx.lineWidth=4;ctx.strokeStyle='#ffffff';ctx.strokeText(q.name,q.x,q.y-20);ctx.fillStyle='#172033';ctx.fillText(q.name,q.x,q.y-20)}
- if(arenaInset>0){ctx.strokeStyle='#ff6b6b';ctx.lineWidth=8;ctx.setLineDash([20,12]);ctx.strokeRect(arenaInset,arenaInset,WORLD-2*arenaInset,WORLD-2*arenaInset);ctx.setLineDash([])}ctx.restore();ctx.strokeStyle='#98afc8';ctx.lineWidth=7;ctx.strokeRect(0,0,WORLD,WORLD);ctx.restore()}
-function updateHud(){let p=players[localId];if(p){$('hudName').textContent=p.name;$('hudStats').textContent=`Territory: ${Math.round((p.score||0)/(GRID*GRID)*100)}%`;$('hudPlayers').textContent=`Players: ${Object.keys(players).length}/5`;}let left=Math.max(0,shrinkAt-Date.now());$('hudArena').textContent=arenaInset>=WORLD/2?'Arena closing':`Arena shrinks in ${String(Math.floor(left/60000)).padStart(2,'0')}:${String(Math.floor(left/1000)%60).padStart(2,'0')}`}
-$('createBtn').onclick=createRoom;$('joinBtn').onclick=joinRoom;$('copyCode').onclick=async()=>{let text=$('showRoomCode').textContent;try{if(navigator.clipboard&&navigator.clipboard.writeText){await navigator.clipboard.writeText(text);say('Room code copied!')}else{throw new Error('clipboard unavailable')}}catch(e){const r=document.createRange();r.selectNodeContents($('showRoomCode'));const sel=getSelection();sel.removeAllRanges();sel.addRange(r);say('Room code selected. Press Ctrl+C to copy.')}};$('backMenu').onclick=leaveToMenu;$('leaveGame').onclick=leaveToLobby;$('leaveBtn').onclick=leaveToLobby;$('reviveBtn').onclick=revive;
-function revive(){if(host){let p=players[localId];if(!p)return;p.alive=true;const spawn=SPAWNS[((p.slot||1)-1)%SPAWNS.length];p.x=spawn[0];p.y=spawn[1];p.dir={x:1,y:0};p.trail=[];p.invuln=performance.now()+3500;crashed=false;running=true;show('game');broadcast({type:'revive',id:localId});requestAnimationFrame(frame);say('Revived! You are briefly protected.')}else{let c=connections.get(hostPeerId);if(c&&c.open)c.send({type:'reviveRequest'});else say('Connection lost. Leave and reconnect.');}}
-function leaveToLobby(){if(host){if(players[localId])delete players[localId];broadcast({type:'end'});}else{let c=connections.get(hostPeerId);if(c&&c.open)c.send({type:'leave'})}running=false;crashed=false;matchStarted=false;show('lobby');renderLobby()}
-function leaveToMenu(){roomAttempt++;running=false;try{for(let c of connections.values())c.close();if(peer)peer.destroy()}catch(e){}connections.clear();players={};peer=null;trRoom=null;trData=null;hostPeerId='';host=false;matchStarted=false;crashed=false;show('menu');setStatus('menuStatus','Create a room or enter a friend’s room code.')}
-// host handles revive requests without bots; revive the requesting human only.
-const oldHostMessage=hostMessage;hostMessage=function(id,d){if(d?.type==='reviveRequest'&&host&&players[id]){let p=players[id];p.alive=true;const spawn=SPAWNS[((p.slot||1)-1)%SPAWNS.length];p.x=spawn[0]+rand(41)-20;p.y=spawn[1]+rand(41)-20;p.trail=[];p.dir={x:1,y:0};p.invuln=performance.now()+3500;let c=connections.get(id);if(c&&c.open)c.send({type:'revive',id});broadcast({type:'state',players:publicPlayers(),grid:Array.from(grid),arenaInset,shrinkAt,started:matchStarted});return}oldHostMessage(id,d)};
-// Host is the authoritative simulation. Start only when five genuine peer connections exist.
+  function resetGame(){
+    cancelAnimationFrame(raf); raf=0; holding=false; paused=false;
+    gameState="ready"; distance=0; elapsed=0; lastSpawn=0; countdown=0; score=0; crashed=false;
+    targetDistance = mode === "levels" ? 500 : 5000;
+    ship={x:170,y:H/2,vy:0,r:13}; obstacles=[]; particles=[];
+    $("distanceText").textContent="0 m"; $("progressFill").style.width="0%"; $("statusText").textContent="READY";
+    $("progressLabel").textContent = mode === "levels" ? `LEVEL ${level} · 500 M` : "5000 M FINISH";
+    $("pauseBtn").textContent="Ⅱ PAUSE"; $("gameMessage").textContent="Tip: short taps help you thread through tight gaps.";
+    $("overlay").classList.remove("hidden");
+    $("overlay").innerHTML = mode === "levels" ? `<div class="overlay-card"><p class="eyebrow">NORMAL LEVELS · LEVEL ${level}</p><h2>Ready?</h2><p>Reach 500 m to clear this level. Each level gets a little harder.</p><button id="beginBtn" class="primary">START LEVEL ${level}</button><button id="levelMenuBtn" class="secondary">LEVEL SELECT</button></div>` : '<div class="overlay-card"><p class="eyebrow">READY, PILOT?</p><h2>5000 metres.</h2><p>Hold the screen, mouse button, or SPACE to rise. Release to fall.</p><button id="beginBtn" class="primary">START RACE</button></div>';
+    $("beginBtn").addEventListener("click", beginRace);
+    const levelMenuBtn = $("levelMenuBtn"); if (levelMenuBtn) levelMenuBtn.addEventListener("click", showLevelSelect);
+    draw();
+  }
+  function startGame(fromPractice=true){
+    practice=fromPractice; mode = fromPractice ? "race" : mode; show(gamePanel); resetGame();
+  }
+  function showLevelSelect(){
+    const choices = Array.from({length:12}, (_,i)=>i+1).map(n => `<button class="${n<=unlockedLevel?"primary":"secondary"}" data-level="${n}" ${n>unlockedLevel?"disabled":""}>LEVEL ${n}${n<=unlockedLevel?"":" 🔒"}</button>`).join("");
+    $("overlay").classList.remove("hidden");
+    $("overlay").innerHTML = `<div class="overlay-card"><p class="eyebrow">NORMAL LEVELS</p><h2>Choose level</h2><p>Clear a level to unlock the next one. There are 12 levels.</p><div class="level-grid">${choices}</div><button id="levelSelectBack" class="secondary">BACK</button></div>`;
+    $("overlay").querySelectorAll("[data-level]").forEach(btn=>btn.addEventListener("click",()=>{level=Number(btn.dataset.level);mode="levels";resetGame();}));
+    $("levelSelectBack").addEventListener("click",()=>show(home));
+  }
+  function startLevel(n=1){ mode="levels"; level=n; show(gamePanel); resetGame(); }
+
+  function beginRace(){
+    if(gameState==="running")return;
+    $("overlay").classList.add("hidden"); gameState="running"; $("statusText").textContent="RACING";
+    lastTime=performance.now(); raf=requestAnimationFrame(loop);
+  }
+  function loop(now){
+    if(gameState!=="running" || paused)return;
+    const dt=Math.min(.034,(now-lastTime)/1000 || .016); lastTime=now;
+    update(dt); draw(); raf=requestAnimationFrame(loop);
+  }
+  function update(dt){
+    elapsed+=dt;
+    // Distance is in metres; speed gradually increases, capped for smooth play.
+    const difficulty = mode === "levels" ? level : 1;
+    const speed = mode === "levels" ? 25 + difficulty * 1.8 : 24 + Math.min(8,distance/250);
+    distance=Math.min(targetDistance,distance+speed*dt);
+    $("distanceText").textContent=Math.floor(distance)+" m";
+    $("progressFill").style.width=(distance/targetDistance*100)+"%";
+    ship.vy += (holding ? -330 : 245)*dt;
+    ship.vy=clamp(ship.vy,-190,205);
+    ship.y+=ship.vy*dt;
+    if(ship.y<28 || ship.y>H-28){ crash("You hit the tunnel edge! Back to the start."); return; }
+    if(elapsed-lastSpawn>(mode === "levels" ? Math.max(1.05, 1.8 - level*0.045) : 1.75)){
+      lastSpawn=elapsed;
+      const gapY=rand(130,H-130);
+      const gap= mode === "levels" ? Math.max(145, 265 - level*8) : rand(210,270);
+      const type=Math.random();
+      obstacles.push({x:W+40,w:type<.65?46:64,gapY,gap,type:type<.65?"gate":"gear",phase:rand(0,6.28),passed:false});
+    }
+    for(const o of obstacles){
+      o.x-=speed*3.25*dt; o.phase+=dt*3;
+      if(!o.passed && o.x+o.w<ship.x){o.passed=true;score++;}
+      if(ship.x+ship.r>o.x && ship.x-ship.r<o.x+o.w){
+        const top=o.gapY-o.gap/2, bottom=o.gapY+o.gap/2;
+        if(ship.y-ship.r+5<top || ship.y+ship.r-5>bottom){crash("Obstacle hit! You restart at 0 m.");return;}
+        if(o.type==="gear" && Math.abs(ship.y-o.gapY)<14 && Math.abs(ship.x-(o.x+o.w/2))<18){crash("Gear collision! Back to the starting line.");return;}
+      }
+    }
+    obstacles=obstacles.filter(o=>o.x+o.w>-20);
+    for(let i=particles.length-1;i>=0;i--){const p=particles[i];p.x+=p.vx*dt;p.y+=p.vy*dt;p.life-=dt;if(p.life<=0)particles.splice(i,1);}
+    if(distance>=targetDistance){ mode === "levels" ? finishLevel() : finishRace(); }
+  }
+  function crash(message){
+    gameState="crashed"; crashed=true; holding=false;
+    $("statusText").textContent="CRASH"; $("gameMessage").textContent=message;
+    $("overlay").classList.remove("hidden");
+    $("overlay").innerHTML=`<div class="overlay-card"><p class="eyebrow">RACE OVER</p><h2>Back to start.</h2><p>${escapeHtml(message)} Your next attempt begins at 0 m.</p><button id="againBtn" class="primary">↻ TRY AGAIN</button><button id="menuFromCrash" class="secondary">MAIN MENU</button></div>`;
+    $("againBtn").addEventListener("click",()=>{resetGame();beginRace();});
+    $("menuFromCrash").addEventListener("click",()=>show(home));
+    cancelAnimationFrame(raf); draw();
+  }
+  function finishLevel(){
+    gameState="finished"; $("statusText").textContent="LEVEL CLEAR"; $("gameMessage").textContent=`You cleared level ${level}!`;
+    unlockedLevel = Math.max(unlockedLevel, Math.min(12, level + 1));
+    localStorage.setItem("neonWaveUnlockedLevel", String(unlockedLevel));
+    $("overlay").classList.remove("hidden");
+    const finalLevel = level >= 12;
+    $("overlay").innerHTML = `<div class="overlay-card"><p class="eyebrow">LEVEL ${level} COMPLETE</p><h2>${finalLevel?"ALL LEVELS CLEARED!":"LEVEL CLEAR!"}</h2><p>You finished the 500 m level and passed ${score} obstacles.</p>${finalLevel ? "" : '<button id="nextLevelBtn" class="primary">NEXT LEVEL →</button>'}<button id="levelsAgainBtn" class="secondary">LEVEL SELECT</button><button id="menuFromLevel" class="secondary">MAIN MENU</button></div>`;
+    const next = $("nextLevelBtn"); if(next) next.addEventListener("click",()=>startLevel(level+1));
+    $("levelsAgainBtn").addEventListener("click",()=>{show(gamePanel);showLevelSelect();});
+    $("menuFromLevel").addEventListener("click",()=>show(home));
+    cancelAnimationFrame(raf); draw();
+  }
+  function finishRace(){
+    gameState="finished"; $("statusText").textContent="FINISH"; $("gameMessage").textContent="You finished the 5000 m course!";
+    $("overlay").classList.remove("hidden");
+    $("overlay").innerHTML='<div class="overlay-card"><p class="eyebrow">FINISH LINE CROSSED</p><h2>YOU DID IT!</h2><p>5000 / 5000 metres complete. Practice score: '+score+' obstacles passed.</p><button id="againBtn" class="primary">RACE AGAIN</button><button id="menuFromFinish" class="secondary">MAIN MENU</button></div>';
+    $("againBtn").addEventListener("click",()=>{resetGame();beginRace();});
+    $("menuFromFinish").addEventListener("click",()=>show(home));
+    cancelAnimationFrame(raf);draw();
+  }
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    const bg=ctx.createLinearGradient(0,0,W,H);bg.addColorStop(0,"#101637");bg.addColorStop(1,"#050816");ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+    // Moving star field
+    for(let i=0;i<75;i++){
+      const x=((i*137 + elapsed*-(12+(i%4)*9))%(W+20)+W+20)%(W+20);
+      const y=(i*71)%H;ctx.fillStyle=i%5===0?"#ff4fbd88":"#6cf7ff77";ctx.fillRect(x,y,i%7===0?3:1.5,1.5);
+    }
+    // tunnel rails
+    ctx.save();ctx.shadowBlur=14;ctx.shadowColor="#5df7ff";ctx.strokeStyle="#3be5ff99";ctx.lineWidth=3;
+    ctx.beginPath();ctx.moveTo(0,18);ctx.lineTo(W,18);ctx.moveTo(0,H-18);ctx.lineTo(W,H-18);ctx.stroke();ctx.restore();
+    // centre guide dashes
+    ctx.strokeStyle="#29375c";ctx.setLineDash([12,18]);ctx.beginPath();ctx.moveTo(0,H/2);ctx.lineTo(W,H/2);ctx.stroke();ctx.setLineDash([]);
+    // distance markers
+    ctx.fillStyle="#7e8db5";ctx.font="12px Inter";ctx.fillText("START",20,42);ctx.fillText(mode === "levels" ? `LEVEL ${level} · 500 M` : "5000 M",W-(mode === "levels"?140:70),42);
+    for(const o of obstacles){
+      const top=o.gapY-o.gap/2,bottom=o.gapY+o.gap/2;
+      ctx.save();ctx.shadowBlur=16;ctx.shadowColor=o.type==="gear"?"#ff4fbd":"#5df7ff";
+      ctx.fillStyle=o.type==="gear"?"#a52b86":"#123b59";ctx.strokeStyle=o.type==="gear"?"#ff4fbd":"#5df7ff";ctx.lineWidth=3;
+      ctx.fillRect(o.x,18,o.w,top-18);ctx.strokeRect(o.x,18,o.w,top-18);
+      ctx.fillRect(o.x,bottom,o.w,H-18-bottom);ctx.strokeRect(o.x,bottom,o.w,H-18-bottom);
+      if(o.type==="gear"){
+        const gx=o.x+o.w/2,gy=o.gapY;ctx.translate(gx,gy);ctx.rotate(o.phase);
+        ctx.strokeStyle="#ff8bd5";ctx.lineWidth=5;ctx.beginPath();
+        for(let k=0;k<8;k++){const a=k*Math.PI/4;ctx.moveTo(Math.cos(a)*10,Math.sin(a)*10);ctx.lineTo(Math.cos(a)*26,Math.sin(a)*26);}
+        ctx.stroke();ctx.beginPath();ctx.arc(0,0,15,0,Math.PI*2);ctx.stroke();ctx.fillStyle="#ff4fbd";ctx.beginPath();ctx.arc(0,0,5,0,Math.PI*2);ctx.fill();
+      }
+      ctx.restore();
+    }
+    // ship glow and triangular body
+    ctx.save();ctx.translate(ship.x,ship.y);ctx.rotate(clamp(ship.vy/500,-.5,.5));ctx.shadowBlur=22;ctx.shadowColor="#5df7ff";
+    ctx.fillStyle="#5df7ff";ctx.strokeStyle="#ffffff";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(19,0);ctx.lineTo(-13,-10);ctx.lineTo(-8,0);ctx.lineTo(-13,10);ctx.closePath();ctx.fill();ctx.stroke();
+    ctx.fillStyle="#ff4fbd";ctx.beginPath();ctx.arc(-3,0,3,0,Math.PI*2);ctx.fill();ctx.restore();
+    // bottom progress trail
+    ctx.fillStyle="#151e3d";ctx.fillRect(0,H-8,W,8);ctx.fillStyle="#ff4fbd";ctx.fillRect(0,H-8,W*(distance/targetDistance),8);
+  }
+  function setHolding(v){if(gameState==="running"&&!paused)holding=v;}
+  $("levelsBtn").addEventListener("click",()=>{mode="levels"; show(gamePanel); showLevelSelect(); resetGame(); showLevelSelect();});
+  $("raceBtn").addEventListener("click",()=>{mode="race"; startGame(true);});
+  $("createBtn").addEventListener("click",()=>enterLobby(randomCode()));
+  $("joinBtn").addEventListener("click",()=>{
+    const code=$("roomInput").value.trim().toUpperCase();
+    if(!code){$("roomInput").focus();$("roomInput").placeholder="ENTER A CODE";return;}
+    enterLobby(code);
+  });
+  $("backBtn").addEventListener("click",()=>show(home));
+  $("leaveRoomBtn").addEventListener("click",()=>show(home));
+  $("startLobbyBtn").addEventListener("click",()=>startGame(false));
+  $("copyCodeBtn").addEventListener("click",async()=>{
+    try{await navigator.clipboard.writeText(currentRoom);$("copyCodeBtn").textContent="COPIED!";}
+    catch(e){$("copyCodeBtn").textContent=currentRoom;}
+    setTimeout(()=>$("copyCodeBtn").textContent="COPY",1200);
+  });
+  $("beginBtn").addEventListener("click",beginRace);
+  $("pauseBtn").addEventListener("click",()=>{
+    if(gameState!=="running")return;
+    paused=!paused;
+    $("pauseBtn").textContent=paused?"▶ RESUME":"Ⅱ PAUSE";
+    $("statusText").textContent=paused?"PAUSED":"RACING";
+    if(paused){cancelAnimationFrame(raf);raf=0;}
+    else{lastTime=performance.now();raf=requestAnimationFrame(loop);}
+  });
+  $("retryBtn").addEventListener("click",()=>{resetGame();beginRace();});
+  $("menuBtn").addEventListener("click",()=>{cancelAnimationFrame(raf);show(home);});
+  canvas.addEventListener("pointerdown",e=>{e.preventDefault();canvas.setPointerCapture?.(e.pointerId);setHolding(true);});
+  ["pointerup","pointercancel","pointerleave"].forEach(ev=>canvas.addEventListener(ev,()=>setHolding(false)));
+  window.addEventListener("keydown",e=>{if(e.code==="Space"||e.code==="ArrowUp"){e.preventDefault();setHolding(true);}if(e.code==="Escape"&&gameState==="running")$("pauseBtn").click();});
+  window.addEventListener("keyup",e=>{if(e.code==="Space"||e.code==="ArrowUp")setHolding(false);});
+  draw();
 })();
 </script>
-</body></html>
+</body>
+</html>

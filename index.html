@@ -135,7 +135,7 @@ body{padding:18px}.shell{width:min(1100px,100%);margin:0 auto}.topbar{display:fl
     cancelAnimationFrame(raf); raf=0; holding=false; paused=false;
     gameState="ready"; distance=0; elapsed=0; lastSpawn=0; countdown=0; score=0; crashed=false;
     targetDistance = mode === "levels" ? 500 + (level - 1) * 150 : 5000;
-    portal = null; bots = mode === "race" ? [ {name:"NOVA",y:H*.35,progress:0,color:"#ff4fbd"},{name:"PIXEL",y:H*.65,progress:0,color:"#b6ff5d"},{name:"ORBIT",y:H*.5,progress:0,color:"#b18cff"} ] : [];
+    portal = null; bots = mode === "race" ? [ {name:"NOVA",y:H*.35,progress:0,speed:rand(17,33),color:"#ff4fbd",alive:true,skill:rand(.45,.9)},{name:"PIXEL",y:H*.65,progress:0,speed:rand(17,33),color:"#b6ff5d",alive:true,skill:rand(.45,.9)},{name:"ORBIT",y:H*.5,progress:0,speed:rand(17,33),color:"#b18cff",alive:true,skill:rand(.45,.9)} ] : [];
     ship={x:170,y:H/2,vy:0,r:13}; obstacles=[]; particles=[];
     $("distanceText").textContent="0 m"; $("progressFill").style.width="0%"; $("statusText").textContent="READY"; updateLives();
     $("progressLabel").textContent = mode === "levels" ? `LEVEL ${level} · ${targetDistance} M` : "5000 M FINISH";
@@ -173,7 +173,25 @@ body{padding:18px}.shell{width:min(1100px,100%);margin:0 auto}.topbar{display:fl
     // Distance is in metres; speed gradually increases, capped for smooth play.
     const difficulty = mode === "levels" ? level : 1;
     const speed = mode === "levels" ? 25 + difficulty * 1.8 : 24 + Math.min(8,distance/250);
-    for (const bot of bots) bot.progress = Math.min(5000, bot.progress + (21 + (bot.name.length % 3) * 2) * dt);
+    // AI rivals have different speeds, can surge ahead, fall behind, and crash on obstacles.
+    for (const bot of bots) {
+      if (!bot.alive) continue;
+      const surge = Math.sin(elapsed * (0.55 + bot.skill) + bot.name.length) * 5.5;
+      const pace = clamp(bot.speed + surge, 13, 35);
+      const oldProgress = bot.progress;
+      bot.progress = Math.min(5000, bot.progress + pace * dt);
+      const botX = 70 + (bot.progress / 5000) * (W - 180);
+      for (const o of obstacles) {
+        const obstacleDistance = distance + (o.x - ship.x) / 3.25;
+        if (obstacleDistance >= oldProgress && obstacleDistance <= bot.progress + 2) {
+          const top = o.gapY - o.gap / 2, bottom = o.gapY + o.gap / 2;
+          const botY = bot.y + Math.sin(elapsed * 1.8 + bot.name.length) * 26;
+          if (botY < top + 10 || botY > bottom - 10 || (o.type === "gear" && Math.random() < .22)) {
+            bot.alive = false; bot.deathX = botX; bot.deathY = botY; break;
+          }
+        }
+      }
+    }
     distance=Math.min(targetDistance,distance+speed*dt);
     if (distance >= targetDistance - 150 && !portal) portal = {x:W+30, y:H/2, spin:0};
     if (portal) { portal.x -= speed*3.25*dt; portal.spin += dt*2.5; if (portal.x < ship.x+22) { mode === "levels" ? finishLevel() : finishRace(); return; } }
@@ -284,7 +302,16 @@ body{padding:18px}.shell{width:min(1100px,100%);margin:0 auto}.topbar{display:fl
       ctx.restore(); ctx.fillStyle="#ffffff"; ctx.font="bold 14px Inter"; ctx.textAlign="center"; ctx.fillText("FINISH PORTAL",portal.x,H/2+100); ctx.textAlign="left";
     }
     // Race rivals are visual AI bots in 5000m mode.
-    if (mode === "race") bots.forEach((bot,i)=>{ const bx=70+(bot.progress/5000)*(W-180); ctx.save(); ctx.translate(bx,bot.y+Math.sin(elapsed*2+i)*9); ctx.shadowBlur=14;ctx.shadowColor=bot.color;ctx.fillStyle=bot.color;ctx.beginPath();ctx.moveTo(15,0);ctx.lineTo(-10,-7);ctx.lineTo(-6,0);ctx.lineTo(-10,7);ctx.closePath();ctx.fill();ctx.restore();ctx.fillStyle=bot.color;ctx.font="10px Inter";ctx.fillText(bot.name,bx-17,bot.y-16); });
+    if (mode === "race") bots.forEach((bot,i)=>{
+      const bx=70+(bot.progress/5000)*(W-180), by=bot.y+Math.sin(elapsed*1.8+i*2)*26;
+      if (bot.alive) {
+        ctx.save();ctx.translate(bx,by);ctx.shadowBlur=14;ctx.shadowColor=bot.color;ctx.fillStyle=bot.color;ctx.beginPath();ctx.moveTo(15,0);ctx.lineTo(-10,-7);ctx.lineTo(-6,0);ctx.lineTo(-10,7);ctx.closePath();ctx.fill();ctx.restore();
+        ctx.fillStyle=bot.color;ctx.font="10px Inter";ctx.fillText(bot.name,bx-17,by-16);
+      } else {
+        ctx.save();ctx.globalAlpha=.75;ctx.strokeStyle="#ff5a6b";ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(bx-8,by-8);ctx.lineTo(bx+8,by+8);ctx.moveTo(bx+8,by-8);ctx.lineTo(bx-8,by+8);ctx.stroke();ctx.restore();
+        ctx.fillStyle="#ff7b8a";ctx.font="10px Inter";ctx.fillText(bot.name+" OUT",bx-23,by-16);
+      }
+    });
     // ship glow and triangular body
     ctx.save();ctx.translate(ship.x,ship.y);ctx.rotate(clamp(ship.vy/500,-.5,.5));ctx.shadowBlur=22;ctx.shadowColor="#5df7ff";
     ctx.fillStyle="#5df7ff";ctx.strokeStyle="#ffffff";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(19,0);ctx.lineTo(-13,-10);ctx.lineTo(-8,0);ctx.lineTo(-13,10);ctx.closePath();ctx.fill();ctx.stroke();

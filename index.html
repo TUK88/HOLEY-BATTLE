@@ -56,7 +56,7 @@ body{padding:18px}.shell{width:min(1100px,100%);margin:0 auto}.topbar{display:fl
         <button id="startLobbyBtn" class="primary">▶ START PRACTICE RACE</button>
         <button id="leaveRoomBtn" class="secondary">LEAVE ROOM</button>
       </div>
-      <p class="small-note">This build does not pretend that remote players are connected. The room UI is ready, but genuine five-person matchmaking requires the networking module and a deployed signaling service.</p>
+      <p class="small-note">Room-code screens are included; remote players require a deployed networking service. The room UI is ready, but genuine five-person matchmaking requires the networking module and a deployed signaling service.</p>
     </section>
 
     <section id="gamePanel" class="panel game-panel hidden">
@@ -89,6 +89,7 @@ body{padding:18px}.shell{width:min(1100px,100%);margin:0 auto}.topbar{display:fl
   let ship = {x:170,y:H/2,vy:0,r:13}, obstacles = [], particles = [], elapsed = 0, lastSpawn = 0;
   let practice = true, countdown = 0, score = 0, crashed = false;
   let mode = "race", level = 1, targetDistance = 5000, lives = 0, redeemed = false;
+  let portal = null, bots = [];
   let unlockedLevel = Math.max(1, Number(localStorage.getItem("neonWaveUnlockedLevel") || 1));
   const colors = ["#5df7ff","#ff4fbd","#b6ff5d","#b18cff","#ffb45d"];
   const clamp = (v,a,b) => Math.max(a,Math.min(b,v));
@@ -105,7 +106,7 @@ body{padding:18px}.shell{width:min(1100px,100%);margin:0 auto}.topbar{display:fl
       roster.appendChild(slot);
     }
     $("playerCount").textContent = "1 / 5";
-    $("lobbyStatus").textContent = "Waiting for pilots";
+    $("lobbyStatus").textContent = "Room created · local preview only";
   }
   function escapeHtml(s){return s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
   function enterLobby(code){
@@ -133,13 +134,14 @@ body{padding:18px}.shell{width:min(1100px,100%);margin:0 auto}.topbar{display:fl
   function resetGame(){
     cancelAnimationFrame(raf); raf=0; holding=false; paused=false;
     gameState="ready"; distance=0; elapsed=0; lastSpawn=0; countdown=0; score=0; crashed=false;
-    targetDistance = mode === "levels" ? 500 : 5000;
+    targetDistance = mode === "levels" ? 500 + (level - 1) * 150 : 5000;
+    portal = null; bots = mode === "race" ? [ {name:"NOVA",y:H*.35,progress:0,color:"#ff4fbd"},{name:"PIXEL",y:H*.65,progress:0,color:"#b6ff5d"},{name:"ORBIT",y:H*.5,progress:0,color:"#b18cff"} ] : [];
     ship={x:170,y:H/2,vy:0,r:13}; obstacles=[]; particles=[];
     $("distanceText").textContent="0 m"; $("progressFill").style.width="0%"; $("statusText").textContent="READY"; updateLives();
-    $("progressLabel").textContent = mode === "levels" ? `LEVEL ${level} · 500 M` : "5000 M FINISH";
+    $("progressLabel").textContent = mode === "levels" ? `LEVEL ${level} · ${targetDistance} M` : "5000 M FINISH";
     $("pauseBtn").textContent="Ⅱ PAUSE"; $("gameMessage").textContent="Tip: short taps help you thread through tight gaps.";
     $("overlay").classList.remove("hidden");
-    $("overlay").innerHTML = mode === "levels" ? `<div class="overlay-card"><p class="eyebrow">NORMAL LEVELS · LEVEL ${level}</p><h2>Ready?</h2><p>Reach 500 m to clear this level. Each level gets a little harder.</p><button id="beginBtn" class="primary">START LEVEL ${level}</button><button id="levelMenuBtn" class="secondary">LEVEL SELECT</button></div>` : '<div class="overlay-card"><p class="eyebrow">READY, PILOT?</p><h2>5000 metres.</h2><p>Hold the screen, mouse button, or SPACE to rise. Release to fall.</p><button id="beginBtn" class="primary">START RACE</button></div>';
+    $("overlay").innerHTML = mode === "levels" ? `<div class="overlay-card"><p class="eyebrow">NORMAL LEVELS · LEVEL ${level}</p><h2>Ready?</h2><p>Reach ${targetDistance} m and fly through the finish portal. Levels get longer and harder.</p><button id="beginBtn" class="primary">START LEVEL ${level}</button><button id="levelMenuBtn" class="secondary">LEVEL SELECT</button></div>` : '<div class="overlay-card"><p class="eyebrow">READY, PILOT?</p><h2>5000 metres.</h2><p>Hold the screen, mouse button, or SPACE to rise. Release to fall.</p><button id="beginBtn" class="primary">START RACE</button></div>';
     $("beginBtn").addEventListener("click", beginRace);
     const levelMenuBtn = $("levelMenuBtn"); if (levelMenuBtn) levelMenuBtn.addEventListener("click", showLevelSelect);
     draw();
@@ -171,7 +173,10 @@ body{padding:18px}.shell{width:min(1100px,100%);margin:0 auto}.topbar{display:fl
     // Distance is in metres; speed gradually increases, capped for smooth play.
     const difficulty = mode === "levels" ? level : 1;
     const speed = mode === "levels" ? 25 + difficulty * 1.8 : 24 + Math.min(8,distance/250);
+    for (const bot of bots) bot.progress = Math.min(5000, bot.progress + (21 + (bot.name.length % 3) * 2) * dt);
     distance=Math.min(targetDistance,distance+speed*dt);
+    if (distance >= targetDistance - 150 && !portal) portal = {x:W+30, y:H/2, spin:0};
+    if (portal) { portal.x -= speed*3.25*dt; portal.spin += dt*2.5; if (portal.x < ship.x+22) { mode === "levels" ? finishLevel() : finishRace(); return; } }
     $("distanceText").textContent=Math.floor(distance)+" m";
     $("progressFill").style.width=(distance/targetDistance*100)+"%";
     ship.vy += (holding ? -330 : 245)*dt;
@@ -196,7 +201,7 @@ body{padding:18px}.shell{width:min(1100px,100%);margin:0 auto}.topbar{display:fl
     }
     obstacles=obstacles.filter(o=>o.x+o.w>-20);
     for(let i=particles.length-1;i>=0;i--){const p=particles[i];p.x+=p.vx*dt;p.y+=p.vy*dt;p.life-=dt;if(p.life<=0)particles.splice(i,1);}
-    if(distance>=targetDistance){ mode === "levels" ? finishLevel() : finishRace(); }
+    /* Finish only when the player reaches the visible portal. */
   }
   function crash(message){
     gameState="crashed"; crashed=true; holding=false;
@@ -221,16 +226,16 @@ body{padding:18px}.shell{width:min(1100px,100%);margin:0 auto}.topbar{display:fl
     localStorage.setItem("neonWaveUnlockedLevel", String(unlockedLevel));
     $("overlay").classList.remove("hidden");
     const finalLevel = level >= 12;
-    $("overlay").innerHTML = `<div class="overlay-card"><p class="eyebrow">LEVEL ${level} COMPLETE</p><h2>${finalLevel?"ALL LEVELS CLEARED!":"LEVEL CLEAR!"}</h2><p>You finished the 500 m level and passed ${score} obstacles.</p>${finalLevel ? "" : '<button id="nextLevelBtn" class="primary">NEXT LEVEL →</button>'}<button id="levelsAgainBtn" class="secondary">LEVEL SELECT</button><button id="menuFromLevel" class="secondary">MAIN MENU</button></div>`;
+    $("overlay").innerHTML = `<div class="overlay-card"><p class="eyebrow">LEVEL ${level} COMPLETE</p><h2>${finalLevel?"ALL LEVELS CLEARED!":"LEVEL CLEAR!"}</h2><p>You finished the ${targetDistance} m level and passed ${score} obstacles, then entered the portal.</p>${finalLevel ? "" : '<button id="nextLevelBtn" class="primary">NEXT LEVEL →</button>'}<button id="levelsAgainBtn" class="secondary">LEVEL SELECT</button><button id="menuFromLevel" class="secondary">MAIN MENU</button></div>`;
     const next = $("nextLevelBtn"); if(next) next.addEventListener("click",()=>startLevel(level+1));
     $("levelsAgainBtn").addEventListener("click",()=>{show(gamePanel);showLevelSelect();});
     $("menuFromLevel").addEventListener("click",()=>show(home));
     cancelAnimationFrame(raf); draw();
   }
   function finishRace(){
-    gameState="finished"; $("statusText").textContent="FINISH"; $("gameMessage").textContent="You finished the 5000 m course!";
+    gameState="finished"; $("statusText").textContent="FINISH"; $("gameMessage").textContent="You finished the 5000 m course through the portal!";
     $("overlay").classList.remove("hidden");
-    $("overlay").innerHTML='<div class="overlay-card"><p class="eyebrow">FINISH LINE CROSSED</p><h2>YOU DID IT!</h2><p>5000 / 5000 metres complete. Practice score: '+score+' obstacles passed.</p><button id="againBtn" class="primary">RACE AGAIN</button><button id="menuFromFinish" class="secondary">MAIN MENU</button></div>';
+    $("overlay").innerHTML='<div class="overlay-card"><p class="eyebrow">FINISH LINE CROSSED</p><h2>YOU DID IT!</h2><p>5000 / 5000 metres complete. Practice score: '+score+' obstacles passed. Race bots competed with you.</p><button id="againBtn" class="primary">RACE AGAIN</button><button id="menuFromFinish" class="secondary">MAIN MENU</button></div>';
     $("againBtn").addEventListener("click",()=>{
       cancelAnimationFrame(raf); raf=0; holding=false; paused=false; gameState="ready"; crashed=false;
       ship={x:170,y:H/2,vy:0,r:13}; obstacles=[]; particles=[]; elapsed=0; lastSpawn=0; lastTime=0;
@@ -255,7 +260,7 @@ body{padding:18px}.shell{width:min(1100px,100%);margin:0 auto}.topbar{display:fl
     // centre guide dashes
     ctx.strokeStyle="#29375c";ctx.setLineDash([12,18]);ctx.beginPath();ctx.moveTo(0,H/2);ctx.lineTo(W,H/2);ctx.stroke();ctx.setLineDash([]);
     // distance markers
-    ctx.fillStyle="#7e8db5";ctx.font="12px Inter";ctx.fillText("START",20,42);ctx.fillText(mode === "levels" ? `LEVEL ${level} · 500 M` : "5000 M",W-(mode === "levels"?140:70),42);
+    ctx.fillStyle="#7e8db5";ctx.font="12px Inter";ctx.fillText("START",20,42);ctx.fillText(mode === "levels" ? `LEVEL ${level} · ${targetDistance} M` : "5000 M",W-(mode === "levels"?140:70),42);
     for(const o of obstacles){
       const top=o.gapY-o.gap/2,bottom=o.gapY+o.gap/2;
       ctx.save();ctx.shadowBlur=16;ctx.shadowColor=o.type==="gear"?"#ff4fbd":"#5df7ff";
@@ -270,6 +275,16 @@ body{padding:18px}.shell{width:min(1100px,100%);margin:0 auto}.topbar{display:fl
       }
       ctx.restore();
     }
+    // Finish portal appears at the end of every level and race.
+    if (portal) {
+      ctx.save(); ctx.translate(portal.x, portal.y); ctx.rotate(portal.spin);
+      ctx.shadowBlur=30; ctx.shadowColor="#5df7ff"; ctx.strokeStyle="#5df7ff"; ctx.lineWidth=8;
+      ctx.beginPath(); ctx.ellipse(0,0,34,72,0,0,Math.PI*2); ctx.stroke();
+      ctx.strokeStyle="#ff4fbd"; ctx.lineWidth=3; ctx.beginPath(); ctx.ellipse(0,0,23,58,0,0,Math.PI*2); ctx.stroke();
+      ctx.restore(); ctx.fillStyle="#ffffff"; ctx.font="bold 14px Inter"; ctx.textAlign="center"; ctx.fillText("FINISH PORTAL",portal.x,H/2+100); ctx.textAlign="left";
+    }
+    // Race rivals are visual AI bots in 5000m mode.
+    if (mode === "race") bots.forEach((bot,i)=>{ const bx=70+(bot.progress/5000)*(W-180); ctx.save(); ctx.translate(bx,bot.y+Math.sin(elapsed*2+i)*9); ctx.shadowBlur=14;ctx.shadowColor=bot.color;ctx.fillStyle=bot.color;ctx.beginPath();ctx.moveTo(15,0);ctx.lineTo(-10,-7);ctx.lineTo(-6,0);ctx.lineTo(-10,7);ctx.closePath();ctx.fill();ctx.restore();ctx.fillStyle=bot.color;ctx.font="10px Inter";ctx.fillText(bot.name,bx-17,bot.y-16); });
     // ship glow and triangular body
     ctx.save();ctx.translate(ship.x,ship.y);ctx.rotate(clamp(ship.vy/500,-.5,.5));ctx.shadowBlur=22;ctx.shadowColor="#5df7ff";
     ctx.fillStyle="#5df7ff";ctx.strokeStyle="#ffffff";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(19,0);ctx.lineTo(-13,-10);ctx.lineTo(-8,0);ctx.lineTo(-13,10);ctx.closePath();ctx.fill();ctx.stroke();
@@ -314,6 +329,7 @@ body{padding:18px}.shell{width:min(1100px,100%);margin:0 auto}.topbar{display:fl
   window.addEventListener("keyup",e=>{if(e.code==="Space"||e.code==="ArrowUp")setHolding(false);});
   draw();
 })();
+
 </script>
 </body>
 </html>
